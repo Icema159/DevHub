@@ -1,0 +1,38 @@
+{
+  "name": "@developer-knowledge-hub/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./queue/document-deletion": {
+      "types": "./src/queue/document-deletion.ts",
+      "default": "./src/queue/document-deletion.ts"
+    },
+    "./queue/document-embedding": {
+      "types": "./src/queue/document-embedding.ts",
+      "default": "./src/queue/document-embedding.ts"
+    },
+    "./queue/document-processing": {
+      "types": "./src/queue/document-processing.ts",
+      "default": "./src/queue/document-processing.ts"
+    },
+    "./queue/redis-connection": {
+      "types": "./src/queue/redis-connection.ts",
+      "default": "./src/queue/redis-connection.ts"
+    },
+    "./resource-guard/ai-budget": {
+      "types": "./src/resource-guard/ai-budget.ts",
+      "default": "./src/resource-guard/ai-budget.ts"
+    }
+  },
+  "scripts": {
+    "test": "tsx --test src/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.8.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.1"
+  }
+}

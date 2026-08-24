@@ -1,0 +1,166 @@
+[
+  {
+    "scenario": "prefers-reduced-motion",
+    "screenshot": "documents-v3-reduced-motion-1280x800.png",
+    "motion": {
+      "mediaMatches": true,
+      "fields": [
+        {
+          "animationName": "none",
+          "transform": "none",
+          "willChange": "auto",
+          "visible": true
+        },
+        {
+          "animationName": "none",
+          "transform": "none",
+          "willChange": "auto",
+          "visible": true
+        },
+        {
+          "animationName": "none",
+          "transform": "none",
+          "willChange": "auto",
+          "visible": true
+        }
+      ],
+      "activeDocumentAnimations": []
+    },
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "ambientFields": 3,
+      "toolbar": {
+        "background": "linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(237, 233, 254, 0.055)) repeat scroll 0% 0% / auto padding-box border-box, rgba(255, 255, 255, 0.64) none repeat scroll 0% 0% / auto padding-box border-box",
+        "backdropFilter": "blur(26px) saturate(1.12)"
+      },
+      "library": {
+        "background": "rgba(255, 255, 255, 0.97) none repeat scroll 0% 0% / auto padding-box border-box",
+        "backdropFilter": "none"
+      }
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "backdrop-filter-fallback",
+    "screenshot": "documents-v3-no-backdrop-filter-1280x800.png",
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "ambientFields": 3,
+      "toolbar": {
+        "background": "rgba(255, 255, 255, 0.94) none repeat scroll 0% 0% / auto padding-box border-box",
+        "backdropFilter": "none"
+      },
+      "library": {
+        "background": "rgba(255, 255, 255, 0.97) none repeat scroll 0% 0% / auto padding-box border-box",
+        "backdropFilter": "none"
+      }
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "network-and-keyboard",
+    "requestCounts": {
+      "initial": 1,
+      "searchDelta": 1,
+      "filterDelta": 1,
+      "refreshDelta": 1
+    },
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20&search=JWT+authentication",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20&search=JWT+authentication&status=PROCESSING",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20&search=JWT+authentication&status=PROCESSING",
+        "postData": null
+      }
+    ],
+    "responses": [
+      {
+        "status": 200,
+        "url": "http://localhost:3000/api/documents?page=1&limit=20"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost:3000/api/documents?page=1&limit=20&search=JWT+authentication"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost:3000/api/documents?page=1&limit=20&search=JWT+authentication&status=PROCESSING"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost:3000/api/documents?page=1&limit=20&search=JWT+authentication&status=PROCESSING"
+      }
+    ],
+    "keyboardPath": [
+      {
+        "tag": "INPUT",
+        "name": ""
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Clear search"
+      },
+      {
+        "tag": "BUTTON",
+        "name": "All0"
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Ready0"
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Processing0"
+      },
+      {
+        "tag": "BUTTON",
+        "name": "Failed0"
+      }
+    ],
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "ambientFields": 3,
+      "toolbar": {
+        "background": "linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(237, 233, 254, 0.055)) repeat scroll 0% 0% / auto padding-box border-box, rgba(255, 255, 255, 0.64) none repeat scroll 0% 0% / auto padding-box border-box",
+        "backdropFilter": "blur(26px) saturate(1.12)"
+      },
+      "library": {
+        "background": "rgba(255, 255, 255, 0.97) none repeat scroll 0% 0% / auto padding-box border-box",
+        "backdropFilter": "none"
+      }
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  }
+]

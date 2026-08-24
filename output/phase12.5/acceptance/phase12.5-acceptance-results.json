@@ -1,0 +1,4781 @@
+[
+  {
+    "scenario": "login-1440x900",
+    "inspection": {
+      "url": "/login",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1440,
+      "ambientFields": 0,
+      "h1": "Welcome back",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to authentication form",
+          "width": 215,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 220,
+          "height": 36
+        },
+        {
+          "name": "",
+          "width": 414,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 414,
+          "height": 44
+        },
+        {
+          "name": "Sign in",
+          "width": 414,
+          "height": 48
+        },
+        {
+          "name": "Create an account",
+          "width": 124,
+          "height": 17
+        }
+      ]
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "error: Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "register-1440x900",
+    "inspection": {
+      "url": "/register",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1440,
+      "ambientFields": 0,
+      "h1": "Create an account",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to authentication form",
+          "width": 215,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 220,
+          "height": 36
+        },
+        {
+          "name": "",
+          "width": 414,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 414,
+          "height": 44
+        },
+        {
+          "name": "Create account",
+          "width": 414,
+          "height": 48
+        },
+        {
+          "name": "Sign in",
+          "width": 46,
+          "height": 17
+        }
+      ]
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "login-390x844",
+    "inspection": {
+      "url": "/login",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 0,
+      "h1": "Welcome back",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to authentication form",
+          "width": 215,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 220,
+          "height": 36
+        },
+        {
+          "name": "",
+          "width": 300,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 300,
+          "height": 44
+        },
+        {
+          "name": "Sign in",
+          "width": 300,
+          "height": 48
+        },
+        {
+          "name": "Create an account",
+          "width": 179,
+          "height": 37
+        }
+      ]
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "register-390x844",
+    "inspection": {
+      "url": "/register",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 0,
+      "h1": "Create an account",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to authentication form",
+          "width": 215,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 220,
+          "height": 36
+        },
+        {
+          "name": "",
+          "width": 300,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 300,
+          "height": 44
+        },
+        {
+          "name": "Create account",
+          "width": 300,
+          "height": 48
+        },
+        {
+          "name": "Sign in",
+          "width": 46,
+          "height": 17
+        }
+      ]
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "dashboard-1440x900",
+    "inspection": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1440,
+      "ambientFields": 3,
+      "h1": "Welcome back",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Upload documentAdd PDFs to your knowledge base and make them searchable.",
+          "width": 532,
+          "height": 112
+        },
+        {
+          "name": "New chatStart a conversation and get answers from your documents.",
+          "width": 532,
+          "height": 112
+        },
+        {
+          "name": "Upload your first document",
+          "width": 217,
+          "height": 44
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?status=FAILED&page=1&limit=3",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "dashboard-1024x768",
+    "inspection": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1024,
+      "ambientFields": 3,
+      "h1": "Welcome back",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Upload documentAdd PDFs to your knowledge base and make them searchable.",
+          "width": 324,
+          "height": 130
+        },
+        {
+          "name": "New chatStart a conversation and get answers from your documents.",
+          "width": 324,
+          "height": 130
+        },
+        {
+          "name": "Upload your first document",
+          "width": 217,
+          "height": 44
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?status=FAILED&page=1&limit=3",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "dashboard-390x844",
+    "inspection": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "Welcome back",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Upload documentAdd PDFs to your knowledge base and make them searchable.",
+          "width": 358,
+          "height": 112
+        },
+        {
+          "name": "New chatStart a conversation and get answers from your documents.",
+          "width": 358,
+          "height": 112
+        },
+        {
+          "name": "Upload your first document",
+          "width": 324,
+          "height": 44
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?status=FAILED&page=1&limit=3",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "documents-1440x900",
+    "inspection": {
+      "url": "/documents",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1440,
+      "ambientFields": 3,
+      "h1": "Documents",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Refresh documents",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Upload document",
+          "width": 178,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 586,
+          "height": 44
+        },
+        {
+          "name": "All0",
+          "width": 76,
+          "height": 44
+        },
+        {
+          "name": "Ready0",
+          "width": 101,
+          "height": 44
+        },
+        {
+          "name": "Processing0",
+          "width": 134,
+          "height": 44
+        },
+        {
+          "name": "Failed0",
+          "width": 98,
+          "height": 44
+        },
+        {
+          "name": "Upload your first document",
+          "width": 219,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "documents-1024x768",
+    "inspection": {
+      "url": "/documents",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1024,
+      "ambientFields": 3,
+      "h1": "Documents",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Refresh documents",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Upload document",
+          "width": 178,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 622,
+          "height": 44
+        },
+        {
+          "name": "All0",
+          "width": 76,
+          "height": 44
+        },
+        {
+          "name": "Ready0",
+          "width": 101,
+          "height": 44
+        },
+        {
+          "name": "Processing0",
+          "width": 134,
+          "height": 44
+        },
+        {
+          "name": "Failed0",
+          "width": 98,
+          "height": 44
+        },
+        {
+          "name": "Upload your first document",
+          "width": 219,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "documents-390x844",
+    "inspection": {
+      "url": "/documents",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "Documents",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Refresh documents",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Upload document",
+          "width": 306,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 324,
+          "height": 44
+        },
+        {
+          "name": "All0",
+          "width": 158,
+          "height": 44
+        },
+        {
+          "name": "Ready0",
+          "width": 158,
+          "height": 44
+        },
+        {
+          "name": "Processing0",
+          "width": 158,
+          "height": 44
+        },
+        {
+          "name": "Failed0",
+          "width": 158,
+          "height": 44
+        },
+        {
+          "name": "Upload your first document",
+          "width": 219,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "chat-empty-1440x900",
+    "inspection": {
+      "url": "/chat",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1440,
+      "ambientFields": 3,
+      "h1": "Chat",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "New conversation",
+          "width": 310,
+          "height": 36
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [
+      "GET http://localhost:3000/api/conversations?page=1&limit=20 — net::ERR_ABORTED"
+    ],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=20",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=20",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "chat-empty-390x844",
+    "inspection": {
+      "url": "/chat",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "Chat",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "New conversation",
+          "width": 324,
+          "height": 36
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [
+      "GET http://localhost:3000/api/conversations?page=1&limit=20 — net::ERR_ABORTED"
+    ],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=20",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=20",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "ui-kit-1280x800",
+    "inspection": {
+      "url": "/ui-kit",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 0,
+      "h1": "Design System",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Small",
+          "width": 58,
+          "height": 36
+        },
+        {
+          "name": "Primary",
+          "width": 87,
+          "height": 44
+        },
+        {
+          "name": "Large",
+          "width": 86,
+          "height": 48
+        },
+        {
+          "name": "Secondary",
+          "width": 107,
+          "height": 44
+        },
+        {
+          "name": "Ghost",
+          "width": 74,
+          "height": 44
+        },
+        {
+          "name": "Destructive",
+          "width": 112,
+          "height": 44
+        },
+        {
+          "name": "Notifications",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Primary icon action",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Destructive icon action",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 189,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 189,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 189,
+          "height": 44
+        },
+        {
+          "name": "Clear search",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "ReadyProcessingFailed",
+          "width": 189,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 189,
+          "height": 44
+        },
+        {
+          "name": "Clear search",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Choose a statusReady",
+          "width": 189,
+          "height": 44
+        },
+        {
+          "name": "Selected workspace item",
+          "width": 398,
+          "height": 44
+        },
+        {
+          "name": "More options for Authentication Guide.pdf",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "name": "More options for Distributed Systems Architecture.pdf",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "name": "More options for Legacy API Notes.pdf",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "name": "Source [S1]: Authentication Guide.pdf, page 12",
+          "width": 800,
+          "height": 62
+        },
+        {
+          "name": "Source [S2]: Security Practices.pdf, page 5",
+          "width": 800,
+          "height": 62
+        },
+        {
+          "name": "Copy answer",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Source [S3]: System Architecture.pdf, page 8",
+          "width": 301,
+          "height": 62
+        },
+        {
+          "name": "Open modal",
+          "width": 115,
+          "height": 106
+        },
+        {
+          "name": "Open destructive modal",
+          "width": 196,
+          "height": 106
+        },
+        {
+          "name": "Show success toast",
+          "width": 169,
+          "height": 106
+        },
+        {
+          "name": "Show error toast",
+          "width": 146,
+          "height": 106
+        },
+        {
+          "name": "Add a document",
+          "width": 145,
+          "height": 44
+        },
+        {
+          "name": "Learn about processing",
+          "width": 194,
+          "height": 44
+        },
+        {
+          "name": "Go to next page",
+          "width": 77,
+          "height": 36
+        },
+        {
+          "name": "Go to previous page",
+          "width": 101,
+          "height": 36
+        },
+        {
+          "name": "Go to next page",
+          "width": 77,
+          "height": 36
+        },
+        {
+          "name": "Go to previous page",
+          "width": 101,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 342,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 342,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 342,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Confirm example",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-ready-1440x900",
+    "layout": {
+      "status": {
+        "top": 281,
+        "left": 1034,
+        "width": 373
+      },
+      "info": {
+        "top": 281,
+        "left": 329,
+        "width": 679
+      },
+      "management": {
+        "top": 510,
+        "left": 1034,
+        "width": 373
+      }
+    },
+    "inspection": {
+      "url": "/documents/qa-ready",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1440,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 325,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-ready",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-ready-1280x800",
+    "layout": {
+      "status": {
+        "top": 281,
+        "left": 930,
+        "width": 317
+      },
+      "info": {
+        "top": 281,
+        "left": 329,
+        "width": 575
+      },
+      "management": {
+        "top": 530,
+        "left": 930,
+        "width": 317
+      }
+    },
+    "inspection": {
+      "url": "/documents/qa-ready",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-ready",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-ready-1024x768",
+    "layout": {
+      "status": {
+        "top": 301,
+        "left": 329,
+        "width": 662
+      },
+      "info": {
+        "top": 506,
+        "left": 329,
+        "width": 662
+      },
+      "management": {
+        "top": 920,
+        "left": 329,
+        "width": 662
+      }
+    },
+    "inspection": {
+      "url": "/documents/qa-ready",
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1024,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 614,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-ready",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-ready-768x1024",
+    "layout": {
+      "status": {
+        "top": 337,
+        "left": 25,
+        "width": 718
+      },
+      "info": {
+        "top": 542,
+        "left": 25,
+        "width": 718
+      },
+      "management": {
+        "top": 956,
+        "left": 25,
+        "width": 718
+      }
+    },
+    "inspection": {
+      "url": "/documents/qa-ready",
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 768,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 220,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 670,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-ready",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-ready-390x844",
+    "layout": {
+      "status": {
+        "top": 461,
+        "left": 17,
+        "width": 356
+      },
+      "info": {
+        "top": 678,
+        "left": 17,
+        "width": 356
+      },
+      "management": {
+        "top": 1260,
+        "left": 17,
+        "width": 356
+      }
+    },
+    "inspection": {
+      "url": "/documents/qa-ready",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-ready",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-pending",
+    "groupedAsProcessing": true,
+    "noFabricatedProgress": true,
+    "inspection": {
+      "url": "/documents/qa-pending",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-pending",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-processing",
+    "groupedAsProcessing": true,
+    "noFabricatedProgress": true,
+    "inspection": {
+      "url": "/documents/qa-processing",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-processing",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-chunks_ready",
+    "groupedAsProcessing": true,
+    "noFabricatedProgress": true,
+    "inspection": {
+      "url": "/documents/qa-chunks_ready",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-chunks_ready",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-embedding",
+    "groupedAsProcessing": true,
+    "noFabricatedProgress": true,
+    "inspection": {
+      "url": "/documents/qa-embedding",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-embedding",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-failed-and-retry-dialog",
+    "retryInitialFocus": "Close dialog",
+    "retryFocusRestored": true,
+    "inspection": {
+      "url": "/documents/qa-failed",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Retry processing",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-failed",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-failed-390x844",
+    "inspection": {
+      "url": "/documents/qa-failed-mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Retry processing",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-failed-mobile",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "delete-dialog",
+    "initialFocus": "Close dialog",
+    "focusRestored": true,
+    "inspection": {
+      "url": "/documents/qa-delete",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-delete",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-hostile-filename",
+    "exactTextVisible": true,
+    "injectedScriptCount": 0,
+    "injectedImageCount": 0,
+    "inspection": {
+      "url": "/documents/qa-hostile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_<script>alert(\"x\")</script>_Labai_ilgas_Unicode_файл_文件_📚_.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 316,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-hostile",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-loading",
+    "inspection": {
+      "url": "/documents/qa-loading",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Document",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-loading",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-error",
+    "genericOwnershipCopy": true,
+    "inspection": {
+      "url": "/documents/qa-error",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Unable to load document",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Retry",
+          "width": 81,
+          "height": 36
+        }
+      ]
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-error",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-unavailable",
+    "genericOwnershipCopy": true,
+    "inspection": {
+      "url": "/documents/qa-unavailable",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Document not found",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        }
+      ]
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-unavailable",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "details-network",
+    "initialCount": 1,
+    "refreshDelta": 1,
+    "postIdleCount": 2,
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-network",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-network",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "upload-dialog",
+    "inspection": {
+      "url": "/documents",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Documents",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Refresh documents",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Upload document",
+          "width": 178,
+          "height": 44
+        },
+        {
+          "name": "",
+          "width": 426,
+          "height": 44
+        },
+        {
+          "name": "All0",
+          "width": 76,
+          "height": 44
+        },
+        {
+          "name": "Ready0",
+          "width": 101,
+          "height": 44
+        },
+        {
+          "name": "Processing0",
+          "width": 134,
+          "height": 44
+        },
+        {
+          "name": "Failed0",
+          "width": 98,
+          "height": 44
+        },
+        {
+          "name": "Upload your first document",
+          "width": 219,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=20",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "chat-populated-and-composer",
+    "composerBefore": {
+      "shellPadding": "1px",
+      "exposedBand": 1,
+      "shellBackground": "rgba(255, 255, 255, 0.63) none repeat scroll 0% 0% / auto padding-box border-box",
+      "innerBorder": "1px solid rgb(203, 213, 225)"
+    },
+    "composerFocused": {
+      "boxShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, oklab(0 0 0 / 0) 0px 0px 0px 0px, rgba(15, 23, 42, 0.05) 0px 1px 2px 0px",
+      "borderColor": "oklab(0.868975 -0.0057984 -0.018952)"
+    },
+    "inspection": {
+      "url": "/chat/qa-conversation?page=1",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Chat",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "New conversation",
+          "width": 310,
+          "height": 36
+        },
+        {
+          "name": "JWT AuthenticationWhere should I store it on the client?6 h",
+          "width": 326,
+          "height": 66
+        },
+        {
+          "name": "Source [S1]: Authentication Guide.pdf, page 12",
+          "width": 362,
+          "height": 62
+        },
+        {
+          "name": "",
+          "width": 492,
+          "height": 80
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [
+      "GET http://localhost:3000/api/conversations?page=1&limit=20 — net::ERR_ABORTED",
+      "GET http://localhost:3000/api/conversations/qa-conversation — net::ERR_ABORTED"
+    ],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=20",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations/qa-conversation",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=20",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations/qa-conversation",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "mobile-navigation",
+    "initialFocus": "Close navigation",
+    "focusRestored": true,
+    "inspection": {
+      "url": "/dashboard",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "ambientFields": 3,
+      "h1": "Welcome back",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 36,
+          "height": 36
+        },
+        {
+          "name": "Open navigation",
+          "width": 44,
+          "height": 44
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Upload documentAdd PDFs to your knowledge base and make them searchable.",
+          "width": 358,
+          "height": 112
+        },
+        {
+          "name": "New chatStart a conversation and get answers from your documents.",
+          "width": 358,
+          "height": 112
+        },
+        {
+          "name": "Upload your first document",
+          "width": 324,
+          "height": 44
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        },
+        {
+          "name": "View all",
+          "width": 61,
+          "height": 40
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/conversations?page=1&limit=5",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents?status=FAILED&page=1&limit=3",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "reduced-motion",
+    "motion": {
+      "mediaMatches": true,
+      "fields": [
+        {
+          "animationName": "none",
+          "transform": "none"
+        },
+        {
+          "animationName": "none",
+          "transform": "none"
+        },
+        {
+          "animationName": "none",
+          "transform": "none"
+        }
+      ]
+    },
+    "inspection": {
+      "url": "/documents/qa-reduced",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-reduced",
+        "postData": null
+      }
+    ]
+  },
+  {
+    "scenario": "backdrop-fallback",
+    "fallback": {
+      "backdropFilter": "none",
+      "background": "rgba(255, 255, 255, 0.94) none repeat scroll 0% 0% / auto padding-box border-box"
+    },
+    "inspection": {
+      "url": "/documents/qa-fallback",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "ambientFields": 3,
+      "h1": "Authentication Guide.pdf",
+      "scriptsInsideMain": 0,
+      "focusable": [
+        {
+          "name": "Skip to main content",
+          "width": 170,
+          "height": 36
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 230,
+          "height": 36
+        },
+        {
+          "name": "Dashboard",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Documents",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Chat",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Log out",
+          "width": 230,
+          "height": 44
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Open navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close navigation",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Developer Knowledge Hub dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Dashboard",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Documents",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Chat",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Log out",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Back to documents",
+          "width": 170,
+          "height": 44
+        },
+        {
+          "name": "Refresh",
+          "width": 110,
+          "height": 44
+        },
+        {
+          "name": "Delete document",
+          "width": 269,
+          "height": 44
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Retry processing",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Close dialog",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Cancel",
+          "width": 0,
+          "height": 0
+        },
+        {
+          "name": "Delete document",
+          "width": 0,
+          "height": 0
+        }
+      ]
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/auth/me",
+        "postData": null
+      },
+      {
+        "method": "GET",
+        "url": "http://localhost:3000/api/documents/qa-fallback",
+        "postData": null
+      }
+    ]
+  }
+]

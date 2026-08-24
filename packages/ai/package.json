@@ -1,0 +1,38 @@
+{
+  "name": "@developer-knowledge-hub/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./chat-generation": {
+      "types": "./src/chat-generation.service.ts",
+      "default": "./src/chat-generation.service.ts"
+    },
+    "./embedding": {
+      "types": "./src/embedding.service.ts",
+      "default": "./src/embedding.service.ts"
+    },
+    "./openai-embedding-provider": {
+      "types": "./src/openai-embedding.provider.ts",
+      "default": "./src/openai-embedding.provider.ts"
+    },
+    "./openai-chat-generation-provider": {
+      "types": "./src/openai-chat-generation.provider.ts",
+      "default": "./src/openai-chat-generation.provider.ts"
+    },
+    "./pricing": {
+      "types": "./src/pricing.ts",
+      "default": "./src/pricing.ts"
+    }
+  },
+  "scripts": {
+    "test": "tsx --test src/**/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "openai": "^6.48.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.1"
+  }
+}

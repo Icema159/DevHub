@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Builds and coverage
+dist/
+build/
+coverage/
+.next/
+generated/prisma/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Editors and operating systems
+.DS_Store
+.idea/
+.vscode/
+
+# Local data and uploads
+tmp/
+uploads/
+.local-storage/

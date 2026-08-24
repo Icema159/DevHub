@@ -1,0 +1,58 @@
+{
+  "name": "developer-knowledge-hub",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=22.15.0 <23",
+    "npm": ">=10 <11"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:infra && npm run dev:apps",
+    "dev:infra": "docker compose up -d --wait",
+    "dev:apps": "concurrently --kill-others-on-fail --kill-signal SIGTERM --kill-timeout 30000 --names web,api,worker --prefix-colors blue,green,magenta --pad-prefix \"npm run dev --workspace @developer-knowledge-hub/web\" \"npm run dev --workspace @developer-knowledge-hub/api\" \"npm run dev --workspace @developer-knowledge-hub/worker\"",
+    "dev:down": "docker compose down",
+    "dev:web": "npm run dev --workspace @developer-knowledge-hub/web",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "build:api": "npm run prisma:generate && npm run typecheck --workspace @developer-knowledge-hub/shared && npm run typecheck --workspace @developer-knowledge-hub/ai && npm run typecheck --workspace @developer-knowledge-hub/api",
+    "start:api": "npm run start --workspace @developer-knowledge-hub/api",
+    "build:worker": "npm run prisma:generate && npm run typecheck --workspace @developer-knowledge-hub/shared && npm run typecheck --workspace @developer-knowledge-hub/ai && npm run typecheck --workspace @developer-knowledge-hub/worker",
+    "start:worker": "npm run start --workspace @developer-knowledge-hub/worker",
+    "build:web": "npm run build --workspace @developer-knowledge-hub/web",
+    "preview:web": "npm run preview --workspace @developer-knowledge-hub/web",
+    "typecheck:web": "npm run typecheck --workspace @developer-knowledge-hub/web",
+    "test:web": "npm run test --workspace @developer-knowledge-hub/web",
+    "lint:web": "npm run lint --workspace @developer-knowledge-hub/web",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,mjs,cjs,ts,tsx,json}\"",
+    "format:check": "prettier --check \"**/*.{js,mjs,cjs,ts,tsx,json}\""
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^26.1.1",
+    "@types/pg": "^8.20.0",
+    "concurrently": "^10.0.4",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.5",
+    "prisma": "^7.8.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.64.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.22.0"
+  }
+}

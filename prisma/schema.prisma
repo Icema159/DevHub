@@ -1,0 +1,263 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DocumentStatus {
+  PENDING
+  PROCESSING
+  CHUNKS_READY
+  EMBEDDING
+  READY
+  FAILED
+}
+
+enum MessageRole {
+  SYSTEM
+  USER
+  ASSISTANT
+}
+
+enum DocumentQuotaReservationPurpose {
+  UPLOAD
+  DELETE_ROLLBACK
+}
+
+enum AiTurnReservationStatus {
+  RESERVED
+  COMMITTED
+}
+
+enum AiOperation {
+  QUESTION_EMBEDDING
+  ANSWER_GENERATION
+  TITLE_GENERATION
+  DOCUMENT_EMBEDDING
+}
+
+enum AiBudgetReservationStatus {
+  RESERVED
+  COMMITTED
+  RELEASED
+}
+
+enum AiUsageSource {
+  PROVIDER_REPORTED
+  CONSERVATIVE_ESTIMATE
+}
+
+model User {
+  id                        String                     @id @default(cuid())
+  email                     String                     @unique
+  passwordHash              String
+  name                      String?
+  emailVerifiedAt           DateTime?                  @db.Timestamptz(3)
+  createdAt                 DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt                 DateTime                   @updatedAt @db.Timestamptz(3)
+  documents                 Document[]
+  conversations             Conversation[]
+  sessions                  Session[]
+  emailVerificationTokens   EmailVerificationToken[]
+  refreshTokens             RefreshToken[]
+  documentQuotaReservations DocumentQuotaReservation[]
+  aiTurnReservations        AiTurnReservation[]
+  aiBudgetReservations      AiBudgetReservation[]
+  aiUsageRecords            AiUsageRecord[]
+}
+
+model DocumentQuotaReservation {
+  id              String                          @id @default(cuid())
+  userId          String
+  purpose         DocumentQuotaReservationPurpose
+  documentCount   Int
+  storageBytes    BigInt
+  processingSlots Int
+  expiresAt       DateTime                        @db.Timestamptz(3)
+  createdAt       DateTime                        @default(now()) @db.Timestamptz(3)
+  user            User                            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model AiTurnReservation {
+  id          String                  @id @default(cuid())
+  userId      String
+  status      AiTurnReservationStatus @default(RESERVED)
+  expiresAt   DateTime                @db.Timestamptz(3)
+  committedAt DateTime?               @db.Timestamptz(3)
+  createdAt   DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime                @updatedAt @db.Timestamptz(3)
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status, committedAt])
+  @@index([status, expiresAt])
+}
+
+model AiBudgetPeriod {
+  periodStart       DateTime              @id @db.Timestamptz(3)
+  committedMicroUsd BigInt                @default(0)
+  reservedMicroUsd  BigInt                @default(0)
+  warning50At       DateTime?             @db.Timestamptz(3)
+  warning80At       DateTime?             @db.Timestamptz(3)
+  createdAt         DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime              @updatedAt @db.Timestamptz(3)
+  reservations      AiBudgetReservation[]
+}
+
+model AiBudgetReservation {
+  id               String                    @id @default(cuid())
+  periodStart      DateTime                  @db.Timestamptz(3)
+  userId           String?
+  operation        AiOperation
+  provider         String
+  model            String
+  status           AiBudgetReservationStatus @default(RESERVED)
+  reservedMicroUsd BigInt
+  expiresAt        DateTime                  @db.Timestamptz(3)
+  createdAt        DateTime                  @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime                  @updatedAt @db.Timestamptz(3)
+  period           AiBudgetPeriod            @relation(fields: [periodStart], references: [periodStart], onDelete: Restrict)
+  user             User?                     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  usageRecord      AiUsageRecord?
+
+  @@index([periodStart, status, expiresAt])
+  @@index([userId, createdAt])
+}
+
+model AiUsageRecord {
+  id                String              @id @default(cuid())
+  reservationId     String              @unique
+  userId            String?
+  operation         AiOperation
+  provider          String
+  model             String
+  inputTokens       Int?
+  cachedInputTokens Int?
+  outputTokens      Int?
+  totalTokens       Int?
+  estimatedMicroUsd BigInt
+  source            AiUsageSource
+  createdAt         DateTime            @default(now()) @db.Timestamptz(3)
+  reservation       AiBudgetReservation @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  user              User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+  @@index([operation, createdAt])
+}
+
+model Document {
+  id              String          @id @default(cuid())
+  userId          String
+  name            String
+  storageKey      String          @unique
+  mimeType        String
+  sizeBytes       BigInt
+  fileHash        String
+  status          DocumentStatus  @default(PENDING)
+  processingError String?         @db.Text
+  // Flexible document metadata such as tags, language, page count, and extraction details.
+  metadata        Json?
+  processedAt     DateTime?       @db.Timestamptz(3)
+  deletedAt       DateTime?       @db.Timestamptz(3)
+  createdAt       DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime        @updatedAt @db.Timestamptz(3)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chunks          DocumentChunk[]
+
+  @@unique([userId, fileHash])
+  @@index([userId, status])
+  @@index([userId, createdAt])
+}
+
+model DocumentChunk {
+  id                  String                       @id @default(cuid())
+  documentId          String
+  position            Int
+  content             String                       @db.Text
+  tokenCount          Int?
+  metadata            Json?
+  embeddingModel      String?
+  embeddingDimensions Int?
+  // pgvector storage is fixed to the approved text-embedding-3-small dimension; similarity indexes remain future work.
+  embedding           Unsupported("vector(1536)")?
+  createdAt           DateTime                     @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime                     @updatedAt @db.Timestamptz(3)
+  document            Document                     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  sourceForMessages   Message[]                    @relation("MessageSources")
+
+  @@unique([documentId, position])
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([userId, deletedAt, updatedAt])
+}
+
+model Message {
+  id             String          @id @default(cuid())
+  conversationId String
+  role           MessageRole
+  content        String          @db.Text
+  citations      Json?
+  aiMetadata     Json?
+  createdAt      DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime        @updatedAt @db.Timestamptz(3)
+  conversation   Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sourceChunks   DocumentChunk[] @relation("MessageSources")
+
+  @@index([conversationId, createdAt])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz(3)
+  revokedAt DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz(3)
+  usedAt    DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt, expiresAt])
+}

@@ -1,0 +1,285 @@
+[
+  {
+    "scenario": "1280x800",
+    "screenshot": "acceptance-1280x800.png",
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "gridColumns": "450px 450px",
+      "statColumns": "221px 221px 221px 221px",
+      "desktopSidebarVisible": true,
+      "mobileHeaderVisible": false,
+      "actionRects": [
+        {
+          "width": 452,
+          "height": 112
+        },
+        {
+          "width": 452,
+          "height": 112
+        }
+      ],
+      "lowerSectionTops": [468, 468, 894],
+      "lowerSectionWidths": [450, 450, 920],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "1024x768",
+    "screenshot": "acceptance-1024x768.png",
+    "inspection": {
+      "viewport": {
+        "width": 1024,
+        "height": 768,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1024,
+      "gridColumns": "664px",
+      "statColumns": "326px 326px",
+      "desktopSidebarVisible": true,
+      "mobileHeaderVisible": false,
+      "actionRects": [
+        {
+          "width": 324,
+          "height": 130
+        },
+        {
+          "width": 324,
+          "height": 130
+        }
+      ],
+      "lowerSectionTops": [602, 1028, 1454],
+      "lowerSectionWidths": [664, 664, 664],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "390x844",
+    "screenshot": "acceptance-390x844.png",
+    "inspection": {
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 390,
+      "gridColumns": "358px",
+      "statColumns": "173px 173px",
+      "desktopSidebarVisible": false,
+      "mobileHeaderVisible": true,
+      "actionRects": [
+        {
+          "width": 358,
+          "height": 112
+        },
+        {
+          "width": 358,
+          "height": 112
+        }
+      ],
+      "lowerSectionTops": [880, 1496, 1922],
+      "lowerSectionWidths": [358, 358, 358],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "loading",
+    "screenshot": "acceptance-loading-1280x800.png",
+    "loadingLists": 3,
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "gridColumns": "450px 450px",
+      "statColumns": null,
+      "desktopSidebarVisible": true,
+      "mobileHeaderVisible": false,
+      "actionRects": [
+        {
+          "width": 452,
+          "height": 112
+        },
+        {
+          "width": 452,
+          "height": 112
+        }
+      ],
+      "lowerSectionTops": [460, 460, 930],
+      "lowerSectionWidths": [450, 450, 920],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "error",
+    "screenshot": "acceptance-error-1280x800.png",
+    "alerts": 3,
+    "conversationsVisible": true,
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "gridColumns": "450px 450px",
+      "statColumns": null,
+      "desktopSidebarVisible": true,
+      "mobileHeaderVisible": false,
+      "actionRects": [
+        {
+          "width": 452,
+          "height": 112
+        },
+        {
+          "width": 452,
+          "height": 112
+        }
+      ],
+      "lowerSectionTops": [474, 474, 900],
+      "lowerSectionWidths": [450, 450, 920],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [
+      "error: Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+      "error: Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+    ],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "prefers-reduced-motion",
+    "screenshot": "acceptance-reduced-motion-1280x800.png",
+    "motion": {
+      "mediaMatches": true,
+      "fields": [
+        {
+          "animationName": "none",
+          "transform": "none",
+          "willChange": "auto"
+        },
+        {
+          "animationName": "none",
+          "transform": "none",
+          "willChange": "auto"
+        },
+        {
+          "animationName": "none",
+          "transform": "none",
+          "willChange": "auto"
+        }
+      ]
+    },
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "gridColumns": "450px 450px",
+      "statColumns": "221px 221px 221px 221px",
+      "desktopSidebarVisible": true,
+      "mobileHeaderVisible": false,
+      "actionRects": [
+        {
+          "width": 452,
+          "height": 112
+        },
+        {
+          "width": 452,
+          "height": 112
+        }
+      ],
+      "lowerSectionTops": [468, 468, 894],
+      "lowerSectionWidths": [450, 450, 920],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  },
+  {
+    "scenario": "backdrop-filter-fallback",
+    "screenshot": "acceptance-no-backdrop-filter-1280x800.png",
+    "fallback": {
+      "navigation": {
+        "backdropFilter": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.92)"
+      },
+      "action": {
+        "backdropFilter": "none",
+        "backgroundColor": "rgba(255, 255, 255, 0.9)"
+      },
+      "actionCount": 2,
+      "actionStyle": "backdrop-filter: none !important; background: rgba(255, 255, 255, 0.9) !important;"
+    },
+    "inspection": {
+      "viewport": {
+        "width": 1280,
+        "height": 800,
+        "dpr": 1
+      },
+      "horizontalOverflow": false,
+      "documentWidth": 1280,
+      "gridColumns": "450px 450px",
+      "statColumns": "221px 221px 221px 221px",
+      "desktopSidebarVisible": true,
+      "mobileHeaderVisible": false,
+      "actionRects": [
+        {
+          "width": 452,
+          "height": 112
+        },
+        {
+          "width": 452,
+          "height": 112
+        }
+      ],
+      "lowerSectionTops": [468, 468, 894],
+      "lowerSectionWidths": [450, 450, 920],
+      "scriptsInsideMain": 0,
+      "ambientFields": 3,
+      "heading": "Welcome back, Aismantas"
+    },
+    "consoleIssues": [],
+    "pageErrors": [],
+    "requestFailures": []
+  }
+]
