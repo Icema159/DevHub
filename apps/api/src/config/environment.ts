@@ -204,11 +204,11 @@ export function parsePublicBaseUrl(
 function parseEmailDeliveryDriver(
   value: string | undefined,
   nodeEnvironment: NodeEnvironment,
-): 'console' | 'smtp' {
-  const driver = value ?? (nodeEnvironment === 'production' ? 'smtp' : 'console');
+): 'console' | 'resend' | 'smtp' {
+  const driver = value ?? (nodeEnvironment === 'production' ? 'resend' : 'console');
 
-  if (driver !== 'console' && driver !== 'smtp') {
-    throw new Error('EMAIL_DELIVERY_DRIVER must be either console or smtp');
+  if (driver !== 'console' && driver !== 'resend' && driver !== 'smtp') {
+    throw new Error('EMAIL_DELIVERY_DRIVER must be console, resend, or smtp');
   }
 
   if (nodeEnvironment === 'production' && driver === 'console') {
@@ -265,7 +265,10 @@ export function createApiEnvironment(source: EnvironmentSource, repositoryRootPa
     throw new Error('CORS_ORIGIN and APP_BASE_URL must use the same production Web origin');
   }
 
-  if ((smtpUsername && !smtpPassword) || (!smtpUsername && smtpPassword)) {
+  if (
+    emailDeliveryDriver === 'smtp' &&
+    ((smtpUsername && !smtpPassword) || (!smtpUsername && smtpPassword))
+  ) {
     throw new Error('SMTP_USERNAME and SMTP_PASSWORD must be configured together');
   }
 
@@ -319,18 +322,32 @@ export function createApiEnvironment(source: EnvironmentSource, repositoryRootPa
     databaseUrl: requireEnvironmentVariable('DATABASE_URL', source.DATABASE_URL),
     redisUrl,
     emailDeliveryDriver,
+    resendApiKey:
+      emailDeliveryDriver === 'resend'
+        ? requireEnvironmentVariable('RESEND_API_KEY', source.RESEND_API_KEY)
+        : undefined,
+    emailFrom:
+      emailDeliveryDriver === 'resend'
+        ? requireEnvironmentVariable('EMAIL_FROM', source.EMAIL_FROM)
+        : undefined,
     smtpHost:
       emailDeliveryDriver === 'smtp'
         ? requireEnvironmentVariable('SMTP_HOST', source.SMTP_HOST)
         : undefined,
-    smtpPort: parsePositiveInteger('SMTP_PORT', source.SMTP_PORT, 587),
-    smtpSecure: parseBoolean('SMTP_SECURE', source.SMTP_SECURE, false),
-    smtpUsername,
-    smtpPassword,
+    smtpPort:
+      emailDeliveryDriver === 'smtp'
+        ? parsePositiveInteger('SMTP_PORT', source.SMTP_PORT, 587)
+        : undefined,
+    smtpSecure:
+      emailDeliveryDriver === 'smtp'
+        ? parseBoolean('SMTP_SECURE', source.SMTP_SECURE, false)
+        : undefined,
+    smtpUsername: emailDeliveryDriver === 'smtp' ? smtpUsername : undefined,
+    smtpPassword: emailDeliveryDriver === 'smtp' ? smtpPassword : undefined,
     smtpFrom:
       emailDeliveryDriver === 'smtp'
         ? requireEnvironmentVariable('SMTP_FROM', source.SMTP_FROM)
-        : source.SMTP_FROM,
+        : undefined,
     storageDriver,
     localStoragePath: resolve(repositoryRootPath, source.LOCAL_STORAGE_PATH ?? '.local-storage'),
     maxUploadSizeBytes: parsePositiveInteger(

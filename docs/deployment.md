@@ -2,10 +2,10 @@
 
 ## Status
 
-Phase 14.3A is complete as a preparation and dependency-security triage phase. It defines the first
-Railway environment but does not create services, external resources, production secrets, or a
-deployment. Phase 14.3B owns resource creation, real values, migrations, proxy verification, and
-production acceptance.
+Phase 14.3A is complete as a preparation and dependency-security triage phase. Phase 14.3B has
+created and brought the Web, API, Worker, PostgreSQL/pgvector, and Redis Railway services online;
+production acceptance remains in progress. Verification email delivery uses Resend HTTPS because
+the selected Railway deployment tier does not provide the required outbound SMTP path.
 
 ## Selected topology
 
@@ -16,7 +16,7 @@ Internet
             -> private Railway API
                  -> private PostgreSQL 16 + pgvector
                  -> private Redis
-                 -> Cloudflare R2 / SMTP / OpenAI
+                 -> Cloudflare R2 / Resend HTTPS / OpenAI
 
 Private Railway Worker
   -> private PostgreSQL 16 + pgvector
@@ -36,13 +36,13 @@ lockfile, shared packages, Prisma schema, and generated-client workflow.
 | Service | Exposure | Source/build | Commands | Port/health | Initial policy | Dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
 | `web` | public | root; `/apps/web/Dockerfile` | Dockerfile-owned build/start; no pre-deploy | Railway `PORT`; `/healthz` | 1 replica; `ON_FAILURE`, max 10 | private API |
-| `api` | private | root; Node/Railpack | build `npm run build:api`; pre-deploy `npm run prisma:migrate:deploy`; start `npm run start:api` | Railway `PORT`; `0.0.0.0`; `/api/health` | 1 replica; `ON_FAILURE`, max 10 | pgvector, Redis, R2, SMTP, OpenAI |
+| `api` | private | root; Node/Railpack | build `npm run build:api`; pre-deploy `npm run prisma:migrate:deploy`; start `npm run start:api` | Railway `PORT`; `0.0.0.0`; `/api/health` | 1 replica; `ON_FAILURE`, max 10 | pgvector, Redis, R2, Resend, OpenAI |
 | `worker` | private | root; Node/Railpack | build `npm run build:worker`; start `npm run start:worker`; no pre-deploy | no HTTP port/health | 1 replica; `ON_FAILURE`, max 10; both concurrency values `1` | pgvector, Redis, R2, OpenAI |
 | `pgvector` | private | `pgvector/pgvector:0.8.2-pg16` plus volume | image-owned | internal `5432`; container health | 1 stateful instance | volume `/var/lib/postgresql/data` |
 | `redis` | private | Railway Redis template | template-owned | internal `6379`; template health | 1 stateful instance | template persistence |
 
 Railway health checks gate deployment activation; they are not continuous monitoring. Web health
-proves Caddy only. API health proves API and PostgreSQL connectivity, not Redis, R2, SMTP, or
+proves Caddy only. API health proves API and PostgreSQL connectivity, not Redis, R2, Resend, or
 OpenAI. Worker readiness and continuous dependency monitoring remain deferred.
 
 ## Infrastructure creation order
@@ -53,13 +53,13 @@ OpenAI. Worker readiness and continuous dependency monitoring remain deferred.
 4. Create staged `api`, `worker`, and `web` services from the same repository with root context;
    hold automatic first deployment until configuration is complete.
 5. Configure the Web Dockerfile path and generate its Stage 1 Railway public domain.
-6. During Phase 14.3B, prepare R2, SMTP, OpenAI, and a generated production `CSRF_SECRET`.
+6. During Phase 14.3B, prepare R2, Resend, OpenAI, and a generated production `CSRF_SECRET`.
 7. Configure all service variables and Railway references.
 8. Deploy API first so its pre-deploy migration runs.
 9. Verify database version, pgvector, migrations, vector type, and API health.
 10. Deploy Worker only after migrations succeed.
 11. Deploy Web with its private API reference.
-12. Run auth, upload/queue/RAG, storage, SMTP, proxy-trust, and owner-isolation acceptance.
+12. Run auth, upload/queue/RAG, storage, Resend, proxy-trust, and owner-isolation acceptance.
 13. Optionally attach a custom domain later and repeat origin-dependent checks.
 
 Reference variables can order staged changes, but independent Git-triggered deployments are not
@@ -178,7 +178,7 @@ No real values are included. `Known` identifies when a value can be selected or 
 | `RAILWAY_DOCKERFILE_PATH` | only if not set in UI | no | user / now | `/apps/web/Dockerfile` |
 | `VITE_API_BASE_URL` | omit or `/` | no; browser-visible | policy / now | same-origin API |
 
-Web receives no database, Redis, R2, SMTP, OpenAI, CSRF, or session credentials.
+Web receives no database, Redis, R2, email-provider, OpenAI, CSRF, or session credentials.
 
 ### API
 
@@ -192,10 +192,12 @@ Web receives no database, Redis, R2, SMTP, OpenAI, CSRF, or session credentials.
 | `CSRF_SECRET` | yes | yes | user-generated / Phase 14.3B | stable, server-only, minimum 32 characters |
 | `DATABASE_URL` | yes | yes | pgvector reference / after creation | PostgreSQL |
 | `REDIS_URL` | yes | yes | Redis reference / after creation | queues/protection |
-| `EMAIL_DELIVERY_DRIVER` | yes | no | user / now | `smtp` |
-| `SMTP_HOST`, `SMTP_FROM` | yes for SMTP | host/from no | provider / after setup | delivery/sender |
-| `SMTP_PORT`, `SMTP_SECURE` | optional | no | provider / after setup | defaults `587`/`false` |
-| `SMTP_USERNAME`, `SMTP_PASSWORD` | optional pair | yes | provider / after setup | SMTP authentication |
+| `EMAIL_DELIVERY_DRIVER` | yes | no | user / now | `resend` |
+| `RESEND_API_KEY` | yes for Resend | yes | Resend / after setup | API-only HTTPS credential |
+| `EMAIL_FROM` | yes for Resend | no | user / now | configurable sender identity |
+| `SMTP_HOST`, `SMTP_FROM` | only for optional SMTP | host/from no | alternate provider | optional alternate delivery |
+| `SMTP_PORT`, `SMTP_SECURE` | optional SMTP | no | alternate provider | defaults `587`/`false` |
+| `SMTP_USERNAME`, `SMTP_PASSWORD` | optional SMTP pair | yes | alternate provider | optional SMTP authentication |
 | `STORAGE_DRIVER` | yes | no | user / now | `r2` |
 | `R2_ENDPOINT`, `R2_BUCKET_NAME` | yes for R2 | internal identifiers | Cloudflare / after setup | storage target |
 | `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | yes for R2 | yes | Cloudflare / after setup | storage credentials |
@@ -207,6 +209,23 @@ Web receives no database, Redis, R2, SMTP, OpenAI, CSRF, or session credentials.
 | `GLOBAL_OPENAI_MONTHLY_BUDGET_USD` | optional | operationally sensitive | policy / Phase 14.3B | default `20` |
 
 `LOCAL_STORAGE_PATH` is unused when `STORAGE_DRIVER=r2`.
+
+### Railway Resend email configuration
+
+Configure these variables on the **API service only**:
+
+```text
+EMAIL_DELIVERY_DRIVER=resend
+RESEND_API_KEY=<secret Resend API key>
+EMAIL_FROM=Developer Knowledge Hub <onboarding@resend.dev>
+```
+
+Do not add `RESEND_API_KEY` to Web, Worker, `VITE_*`, repository files, build arguments, or logs.
+When the Resend driver is selected, Railway does not need `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`,
+`SMTP_USERNAME`, `SMTP_PASSWORD`, or `SMTP_FROM`; those settings belong only to the optional SMTP
+adapter. Redeploy API after changing the variables. The temporary `onboarding@resend.dev` sender can
+send test mail only to the Resend account owner's address. Before public external-user delivery,
+verify a custom domain in Resend and replace `EMAIL_FROM` with an address on that domain.
 
 ### Worker
 
@@ -223,7 +242,7 @@ Web receives no database, Redis, R2, SMTP, OpenAI, CSRF, or session credentials.
 | `OPENAI_EMBEDDING_MODEL` | yes in production | no | approved config / now | same as API |
 | `GLOBAL_OPENAI_MONTHLY_BUDGET_USD` | optional, consistent | operationally sensitive | policy / later | app-wide budget |
 
-Worker receives no CORS, public URL, CSRF, SMTP, chat-model, or browser variables. PostgreSQL and
+Worker receives no CORS, public URL, CSRF, email-delivery, chat-model, or browser variables. PostgreSQL and
 Redis own their generated credentials/private hosts and composed URLs. API and Worker consume only
 the composed references. Never put any secret in `VITE_*`, repository files, build arguments,
 screenshots, logs, or documentation.
@@ -280,7 +299,8 @@ development/unreachable.
 
 Nodemailer messages contain only fixed `from`, `to`, `subject`, and plain `text`; they do not use
 raw messages, files/URLs, attachments, custom envelopes/EHLO, List headers, JSON transport, or
-OAuth2. The upgrade is still appropriate because SMTP is a direct production boundary.
+OAuth2. The upgrade remains appropriate because SMTP is still a supported optional adapter even
+though Railway production now uses Resend HTTPS.
 
 The aggregate `prisma`, `@prisma/config`, and `@prisma/dev` nodes inherit the D findings rather than
 adding independent reachable advisories. Prisma remains aligned at 7.8.0. Prisma 7.9.1 reduces the
@@ -298,7 +318,8 @@ not claim a numerically clean audit. `npm audit fix --force` was not used.
 - Create private PostgreSQL and Redis services.
 - Connect the repository and stage Web/API/Worker without premature automatic deploys.
 - Create a private R2 bucket and least-privilege credentials.
-- Select SMTP, verify its sender/domain, and obtain credentials.
+- Create a Resend API key and configure an approved sender. `onboarding@resend.dev` is limited to
+  account-owner testing; verify a custom domain before sending to external users.
 - Create/select an OpenAI project/key and configure billing/spend limits.
 - Generate a new stable production `CSRF_SECRET`.
 - Generate and approve the temporary Railway Web domain.
@@ -308,9 +329,9 @@ not claim a numerically clean audit. `npm audit fix --force` was not used.
 ## Remaining Phase 14.3B acceptance and deferred work
 
 Phase 14.3B must still prove private exposure, PG16/pgvector/migrations/`vector(1536)`, Prisma CLI
-availability in pre-deploy, real R2/SMTP/OpenAI paths, spoof-resistant proxy trust, health,
-auth/cookie/CSRF, upload/processing/RAG/delete, owner isolation, and a real Nodemailer 9 SMTP smoke
-test. Worker readiness, continuous dependency monitoring, backups/restore, rollback, structured
+availability in pre-deploy, real R2/Resend/OpenAI paths, spoof-resistant proxy trust, health,
+auth/cookie/CSRF, upload/processing/RAG/delete, owner isolation, and a real verification-email smoke
+test through Resend HTTPS. Worker readiness, continuous dependency monitoring, backups/restore, rollback, structured
 observability, CI/CD, and global multi-replica concurrency remain deferred.
 
 ## References

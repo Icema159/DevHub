@@ -36,8 +36,10 @@ response for new and existing emails. Unverified sessions may manage basic accou
 cannot upload or reprocess documents, run semantic search, or generate AI answers.
 
 Use a small email-sender interface with capture adapters in tests, guarded console delivery in
-local development, and provider-neutral SMTP in production. Verification links use an explicit
-trusted application base URL and carry the token in a frontend URL fragment.
+local development, Resend's HTTPS API in Railway production, and optional SMTP for alternate
+environments. This transport change avoids deployment-platform SMTP egress restrictions without
+changing verification business logic. Verification links use an explicit trusted application base
+URL and carry the token in a frontend URL fragment.
 
 Use Redis only for atomic fixed-window authentication limits. Session authority remains in
 PostgreSQL. Limiter storage failure is fail-closed for the protected authentication endpoint rather

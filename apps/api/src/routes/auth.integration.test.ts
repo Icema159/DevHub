@@ -16,6 +16,7 @@ import type {
 } from '../services/email-verification-mail.service.js';
 import { generateOpaqueToken, hashOpaqueToken } from '../utils/secure-token.js';
 import { createTestRequestHeaders } from '../test/auth-session.js';
+import { EmailDeliveryError } from '../services/email-delivery-error.js';
 
 interface ApiResponse {
   body: unknown;
@@ -60,6 +61,7 @@ function verificationTokenFrom(delivery: SendVerificationEmailInput): string {
 test('server sessions, verification, revocation, and privileged gates work end to end', async () => {
   const suffix = randomUUID();
   const email = `phase-13b1-${suffix}@example.com`;
+  const deliveryFailureEmail = `phase-resend-failure-${suffix}@example.com`;
   const password = 'correct horse battery staple';
   const captureSender = new CaptureEmailSender();
   const server = app.listen(0, '127.0.0.1');
@@ -274,6 +276,40 @@ test('server sessions, verification, revocation, and privileged gates work end t
       body: { token: expiredRawToken },
     });
     assert.equal(expired.status, 400);
+
+    const logged: unknown[][] = [];
+    const originalConsoleError = console.error;
+    setEmailVerificationSenderForTests({
+      async sendVerificationEmail() {
+        throw new EmailDeliveryError({
+          provider: 'resend',
+          category: 'network_failure',
+        });
+      },
+    });
+    console.error = (...arguments_: unknown[]) => logged.push(arguments_);
+
+    try {
+      const registrationWithDeliveryFailure = await request('/api/auth/register', {
+        method: 'POST',
+        body: { email: deliveryFailureEmail, password },
+      });
+      assert.equal(registrationWithDeliveryFailure.status, 202);
+      assert.deepEqual(registrationWithDeliveryFailure.body, {
+        data: { status: 'VERIFICATION_REQUIRED' },
+      });
+    } finally {
+      console.error = originalConsoleError;
+      setEmailVerificationSenderForTests(captureSender);
+    }
+
+    assert.deepEqual(logged, [
+      [
+        'Initial verification email delivery failed',
+        { provider: 'resend', category: 'network_failure' },
+      ],
+    ]);
+    assert.equal(JSON.stringify(logged).includes(deliveryFailureEmail), false);
   } finally {
     const rateLimiter = getAuthRateLimitService();
     const ipSubjects = ['127.0.0.1', '::ffff:127.0.0.1'];
@@ -290,6 +326,7 @@ test('server sessions, verification, revocation, and privileged gates work end t
       await rateLimiter.reset(AUTH_RATE_LIMIT_POLICIES.resendUser, userId);
       await prisma.user.deleteMany({ where: { id: userId } });
     }
+    await prisma.user.deleteMany({ where: { email: deliveryFailureEmail } });
 
     setEmailVerificationSenderForTests(undefined);
     await closeServer(server);

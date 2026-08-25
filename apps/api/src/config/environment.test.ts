@@ -17,9 +17,9 @@ const productionEnvironment: EnvironmentSource = {
   CSRF_SECRET: 'a-production-csrf-secret-with-32-characters',
   DATABASE_URL: 'postgresql://user:password@database.internal:5432/hub',
   REDIS_URL: 'redis://default:password@redis.internal:6379',
-  EMAIL_DELIVERY_DRIVER: 'smtp',
-  SMTP_HOST: 'smtp.example.com',
-  SMTP_FROM: 'Knowledge Hub <no-reply@example.com>',
+  EMAIL_DELIVERY_DRIVER: 'resend',
+  RESEND_API_KEY: 'resend-api-key',
+  EMAIL_FROM: 'Developer Knowledge Hub <onboarding@resend.dev>',
   STORAGE_DRIVER: 'r2',
   R2_ENDPOINT: 'https://account.r2.cloudflarestorage.com',
   R2_ACCESS_KEY_ID: 'access-key',
@@ -37,6 +37,38 @@ test('production environment accepts explicit deployment configuration', () => {
   assert.equal(environment.port, 8080);
   assert.equal(environment.trustedProxyHops, 1);
   assert.equal(environment.storageDriver, 'r2');
+  assert.equal(environment.emailDeliveryDriver, 'resend');
+  assert.equal(environment.emailFrom, 'Developer Knowledge Hub <onboarding@resend.dev>');
+});
+
+test('Resend delivery fails fast without its API key or sender', () => {
+  assert.throws(
+    () =>
+      createApiEnvironment({ ...productionEnvironment, RESEND_API_KEY: undefined }, '/repository'),
+    /RESEND_API_KEY/,
+  );
+  assert.throws(
+    () => createApiEnvironment({ ...productionEnvironment, EMAIL_FROM: undefined }, '/repository'),
+    /EMAIL_FROM/,
+  );
+});
+
+test('SMTP remains an optional provider with provider-specific validation', () => {
+  const environment = createApiEnvironment(
+    {
+      ...productionEnvironment,
+      EMAIL_DELIVERY_DRIVER: 'smtp',
+      RESEND_API_KEY: undefined,
+      EMAIL_FROM: undefined,
+      SMTP_HOST: 'smtp.example.com',
+      SMTP_FROM: 'Knowledge Hub <no-reply@example.com>',
+    },
+    '/repository',
+  );
+
+  assert.equal(environment.emailDeliveryDriver, 'smtp');
+  assert.equal(environment.smtpHost, 'smtp.example.com');
+  assert.equal(environment.resendApiKey, undefined);
 });
 
 test('Railway PORT has priority while API_PORT remains the local fallback', () => {

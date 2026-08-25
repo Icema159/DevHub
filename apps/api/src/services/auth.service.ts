@@ -8,6 +8,7 @@ import {
 import type { AuthCredentials } from '../utils/auth-input.js';
 import { hashPassword, verifyPassword } from '../utils/password.js';
 import { AppError } from '../utils/app-error.js';
+import { logEmailDeliveryFailure } from './email-delivery-error.js';
 import { emailVerificationService } from './email-verification.service.js';
 import { sessionService } from './session.service.js';
 
@@ -41,8 +42,8 @@ export async function registerUser(credentials: AuthCredentials): Promise<Regist
       createdUser.email,
       preparedToken.rawToken,
     );
-  } catch {
-    console.error('Initial verification email delivery failed');
+  } catch (error) {
+    logEmailDeliveryFailure('Initial verification email delivery failed', error);
   }
 
   return { status: 'VERIFICATION_REQUIRED' };

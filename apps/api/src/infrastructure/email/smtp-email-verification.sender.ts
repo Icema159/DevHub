@@ -1,8 +1,10 @@
 import nodemailer, { type Transporter } from 'nodemailer';
 
-import type {
-  EmailVerificationSender,
-  SendVerificationEmailInput,
+import {
+  buildEmailVerificationText,
+  EMAIL_VERIFICATION_SUBJECT,
+  type EmailVerificationSender,
+  type SendVerificationEmailInput,
 } from '../../services/email-verification-mail.service.js';
 
 export interface SmtpEmailVerificationSenderOptions {
@@ -41,14 +43,8 @@ export class SmtpEmailVerificationSender implements EmailVerificationSender {
     await this.transporter.sendMail({
       from: this.from,
       to: input.recipient,
-      subject: 'Verify your Developer Knowledge Hub email',
-      text: [
-        'Verify your email to upload documents and use AI-powered search and chat.',
-        '',
-        input.verificationUrl,
-        '',
-        'This link expires in 60 minutes and can be used once.',
-      ].join('\n'),
+      subject: EMAIL_VERIFICATION_SUBJECT,
+      text: buildEmailVerificationText(input.verificationUrl),
     });
   }
 }

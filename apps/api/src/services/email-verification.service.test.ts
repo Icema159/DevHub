@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { AppError } from '../utils/app-error.js';
 import { hashOpaqueToken } from '../utils/secure-token.js';
+import { EmailDeliveryError } from './email-delivery-error.js';
 import {
   createEmailVerificationService,
   EMAIL_VERIFICATION_TOKEN_LIFETIME_MS,
@@ -119,4 +120,48 @@ test('verification hashes the submitted bearer token and fails generically when 
   assert.deepEqual(testFixture.consumed, [
     { tokenHash: hashOpaqueToken('a'.repeat(43)), verifiedAt: now },
   ]);
+});
+
+test('resend delivery failure stays generic and logs only safe provider metadata', async () => {
+  const testFixture = fixture();
+  const logged: unknown[][] = [];
+  const originalConsoleError = console.error;
+  testFixture.dependencies.getSender = () => ({
+    async sendVerificationEmail() {
+      throw new EmailDeliveryError({
+        provider: 'resend',
+        category: 'authentication_failure',
+        providerCode: 'invalid_api_key',
+        statusCode: 403,
+      });
+    },
+  });
+  console.error = (...arguments_: unknown[]) => logged.push(arguments_);
+
+  try {
+    const service = createEmailVerificationService(testFixture.dependencies);
+    await assert.rejects(
+      () => service.resendVerification('user-a'),
+      (error) =>
+        error instanceof AppError &&
+        error.statusCode === 503 &&
+        error.code === 'VERIFICATION_EMAIL_UNAVAILABLE',
+    );
+  } finally {
+    console.error = originalConsoleError;
+  }
+
+  assert.deepEqual(logged, [
+    [
+      'Verification email delivery failed',
+      {
+        provider: 'resend',
+        category: 'authentication_failure',
+        providerCode: 'invalid_api_key',
+        statusCode: 403,
+      },
+    ],
+  ]);
+  assert.equal(JSON.stringify(logged).includes('user-a@example.com'), false);
+  assert.equal(JSON.stringify(logged).includes('token='), false);
 });

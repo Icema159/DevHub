@@ -8,6 +8,7 @@ import {
 import { findUserById, type SafeUser } from '../repositories/user.repository.js';
 import { AppError } from '../utils/app-error.js';
 import { generateOpaqueToken, hashOpaqueToken } from '../utils/secure-token.js';
+import { logEmailDeliveryFailure } from './email-delivery-error.js';
 import type { EmailVerificationSender } from './email-verification-mail.service.js';
 
 export const EMAIL_VERIFICATION_TOKEN_LIFETIME_MS = 60 * 60 * 1000;
@@ -114,7 +115,8 @@ export function createEmailVerificationService(
 
       try {
         await deliverVerificationEmail(user.email, preparedToken.rawToken);
-      } catch {
+      } catch (error) {
+        logEmailDeliveryFailure('Verification email delivery failed', error);
         throw verificationEmailUnavailableError();
       }
 

@@ -251,9 +251,13 @@ login. Logout revokes only the current PostgreSQL session before clearing its co
 service operation can revoke every session for a user.
 
 Local development defaults `EMAIL_DELIVERY_DRIVER=console`. The API prints the verification URL
-only in non-production mode. Production refuses console delivery and requires the provider-neutral
-SMTP settings documented in `.env.example`; verification-link hosts always come from the explicit
-`APP_BASE_URL`, never from request headers.
+only in non-production mode. Railway production uses `EMAIL_DELIVERY_DRIVER=resend` and sends
+through Resend's HTTPS API using the API-only `RESEND_API_KEY` and configurable `EMAIL_FROM`.
+Optional SMTP remains available for local or alternate environments, but its variables are not
+required when the Resend driver is selected. Verification-link hosts always come from the explicit
+`APP_BASE_URL`, never from request headers. `onboarding@resend.dev` is suitable only for the initial
+account-owner smoke test; public external-user delivery requires a verified Resend domain and an
+updated sender address.
 
 For local development, copy the frontend example when a custom API location is needed:
 
@@ -270,8 +274,9 @@ service blueprint, root-context workspace builds, PostgreSQL 16 pgvector plan, p
 environment ownership, infrastructure order, proxy-trust acceptance, and user actions for the first
 real environment. It also removed the direct React Router and Nodemailer audit findings through
 focused version updates; the remaining audit nodes are documented Prisma CLI/tooling dependencies.
-See [`docs/deployment.md`](docs/deployment.md). No infrastructure or deployment has been created;
-Phase 14.3B is the next step.
+See [`docs/deployment.md`](docs/deployment.md). The five Railway services are now online and
+Phase 14.3B production acceptance is in progress; verification mail now uses Resend HTTPS because
+Railway SMTP egress is not available for this deployment tier.
 
 From the repository root:
 
