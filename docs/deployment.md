@@ -7,6 +7,13 @@ created and brought the Web, API, Worker, PostgreSQL/pgvector, and Redis Railway
 production acceptance remains in progress. Verification email delivery uses Resend HTTPS because
 the selected Railway deployment tier does not provide the required outbound SMTP path.
 
+Evidence update (2026-08-26): the operator confirms registration, login, verification, R2 upload,
+Worker parsing/chunking/embeddings, pgvector retrieval, RAG/citations, and successfully executed
+cleanup work. This documentation audit did not access Railway or repeat those smoke tests.
+The exact production database major/image, domain/sender-domain state, replica/restart policies,
+proxy hop count, backup/restore, and broader security acceptance are not established here.
+See [the technical reference](technical-documentation.md) and [gap analysis](technical-documentation-gap-analysis.md).
+
 ## Selected topology
 
 ```text
@@ -14,12 +21,12 @@ Internet
   -> public Railway Web (Caddy + compiled React SPA)
        -> same-origin /api/* proxy, URI preserved
             -> private Railway API
-                 -> private PostgreSQL 16 + pgvector
+                 -> private PostgreSQL + pgvector
                  -> private Redis
                  -> Cloudflare R2 / Resend HTTPS / OpenAI
 
 Private Railway Worker
-  -> private PostgreSQL 16 + pgvector
+  -> private PostgreSQL + pgvector
   -> private Redis
   -> Cloudflare R2 / OpenAI
 ```
@@ -29,7 +36,12 @@ browser uses one HTTPS origin and never receives private hostnames or provider c
 
 ## Railway service blueprint
 
-Use these lowercase service names so Railway references remain unambiguous. Every application
+The following is a reproducible reference blueprint, not an inventory read from the running
+Railway project. PostgreSQL 16 is the approved local/reference baseline; confirm the actual
+production major instead of inferring it from this table. Names, replicas, restart settings, and
+volumes below are planned settings until independently checked.
+
+Use consistent service names so Railway references remain unambiguous. Every application
 service uses repository root as source/build context; workspace subdirectories omit the root
 lockfile, shared packages, Prisma schema, and generated-client workflow.
 
@@ -45,7 +57,10 @@ Railway health checks gate deployment activation; they are not continuous monito
 proves Caddy only. API health proves API and PostgreSQL connectivity, not Redis, R2, Resend, or
 OpenAI. Worker readiness and continuous dependency monitoring remain deferred.
 
-## Infrastructure creation order
+## Infrastructure creation order (reference for a fresh environment)
+
+The existing environment is already running. These steps are retained for reproduction, not an
+instruction to create duplicate services or reset production.
 
 1. Create the Railway project and production environment.
 2. Create private PostgreSQL 16 with pgvector and attach its volume.
@@ -81,6 +96,13 @@ prefix is preserved. API handling precedes SPA fallback. The private target exis
 runtime and is never compiled into browser JavaScript. Railway supplies `PORT`. Production omits
 `VITE_API_BASE_URL` (or uses `/`) so requests remain same-origin.
 
+The Chat/Threads streaming endpoint (`POST /api/conversations/:conversationId/messages/stream`, `text/event-stream`) passes through this same `/api` reverse proxy. `apps/web/Caddyfile` sets no custom `flush_interval` or buffering override on the `@api` handler, so it uses Caddy's default streaming-friendly `reverse_proxy` behavior. Railway's own edge closes an SSE connection after 5 minutes with no bytes transferred (15-minute absolute cap even with a heartbeat, per Railway's SSE guidance); the current implementation's worst-case silent gap between events is bounded by the OpenAI provider's own request timeouts (30s embeddings, 60s chat) and stays well inside that window -- see docs/architecture.md's "Conversation streaming (SSE)" section. No heartbeat frame is sent today; confirm this still holds if response latency grows before relying on it long-term.
+
+Use the actual API service name in references. The operator-confirmed API port is currently
+`8080`; an earlier upstream defaulted to port 80 and produced 502 responses. Always match the
+upstream port to the API listener rather than assuming a default. Only Web has this Caddy runtime;
+do not override its start command with `npm`, which is absent from the final Caddy image.
+
 ## API configuration
 
 - Root build context.
@@ -90,7 +112,8 @@ runtime and is never compiled into browser JavaScript. Railway supplies `PORT`. 
 - Private only, Railway `PORT`, health `/api/health`, one replica.
 - API is the only migration owner.
 
-The build generates Prisma Client. Phase 14.3B must verify Railway retains the root Prisma CLI for
+The build generates Prisma Client and typechecks; API/Worker starts intentionally execute
+TypeScript through `tsx`, not a generated JavaScript bundle. Deployment acceptance must verify Railway retains the root Prisma CLI for
 pre-deploy. If it is pruned, use a narrow migration image or make the CLI runtime-available; never
 move migrations into Worker.
 
@@ -106,11 +129,12 @@ current TypeScript loader. Compiled output and global multi-replica concurrency 
 
 ## PostgreSQL and pgvector plan
 
-Railway's generic PostgreSQL template does not include extension binaries. The pgvector template
-currently linked by Railway uses PostgreSQL 18, while the approved and locally tested baseline is
-PostgreSQL 16. Do not silently change database major version.
+The Phase 14.3A preparation audit found that Railway's generic PostgreSQL template did not include
+extension binaries and its linked pgvector template used PostgreSQL 18. That is a dated template
+observation, not a fresh marketplace check. The approved local/reference baseline is PostgreSQL 16;
+do not silently change database major version.
 
-Phase 14.3B should use a private service pinned to `pgvector/pgvector:0.8.2-pg16`, mount a volume at
+For the reference PG16 environment, use a private service pinned to `pgvector/pgvector:0.8.2-pg16`, mount a volume at
 `/var/lib/postgresql/data`, expose only internal `5432`, and provide a private `DATABASE_URL`.
 Using the current PG18 template instead requires a separate compatibility decision.
 
@@ -311,7 +335,10 @@ After remediation, `npm audit --omit=dev` reports 8 package nodes: 0 critical, 4
 All are in the Prisma CLI/build/pre-deploy chain. This removes both direct runtime findings; it does
 not claim a numerically clean audit. `npm audit fix --force` was not used.
 
-## Phase 14.3B user action checklist
+## Phase 14.3B setup checklist (reproduction reference)
+
+The operator has already completed the working main path. Retain this list for a new environment;
+unconfirmed production properties still require inspection, not automatic recreation.
 
 - Create/sign in to Railway and create the project/environment.
 - Approve the PostgreSQL 16 pgvector image plan instead of silently adopting PG18.
@@ -328,11 +355,29 @@ not claim a numerically clean audit. `npm audit fix --force` was not used.
 
 ## Remaining Phase 14.3B acceptance and deferred work
 
-Phase 14.3B must still prove private exposure, PG16/pgvector/migrations/`vector(1536)`, Prisma CLI
-availability in pre-deploy, real R2/Resend/OpenAI paths, spoof-resistant proxy trust, health,
-auth/cookie/CSRF, upload/processing/RAG/delete, owner isolation, and a real verification-email smoke
-test through Resend HTTPS. Worker readiness, continuous dependency monitoring, backups/restore, rollback, structured
-observability, CI/CD, and global multi-replica concurrency remain deferred.
+The main R2/Resend/OpenAI, auth, upload/processing/RAG/citation and successful-cleanup paths are
+operator-confirmed working. Do not describe them as merely unimplemented. Broader acceptance
+still needs recorded evidence for actual exposure, database version/migration state, Prisma CLI
+availability in pre-deploy, forwarding-header spoof resistance, cookie/CSRF behavior, and owner
+isolation in the deployed topology. Exact custom-domain and sender-domain settings, all-recipient
+email delivery, backup/restore, and rollback are not verified by this refresh. Worker readiness,
+structured observability, repeatable CI/deployment acceptance, recovery automation, and global
+multi-replica concurrency remain follow-up work, not new guarantees of this document.
+
+## Operational lessons and known recovery boundaries
+
+The operator confirms that correcting a malformed Worker R2 endpoint restored new processing,
+and a targeted retry of an exhausted cleanup job subsequently removed its stale soft-deleted
+row and object. Same-PDF upload then succeeded. Configuration presence checks alone do not prove
+R2 URL validity or provider access. A successful email API response likewise does not prove inbox
+delivery to every recipient.
+
+The database's `(userId, fileHash)` uniqueness includes hidden soft-deleted rows. Failed cleanup
+can therefore block re-upload until hard deletion. There is no automatic reconciliation or
+orphan repair service. Do not treat repeated queue `add` with an existing ID as a failed-job retry.
+Code inspection also identifies a retained embedding-job ID risk after manual processing Retry
+and a pre-EMBEDDING failure-state gap; neither was reproduced or fixed in this documentation task.
+See technical-reference section 33 for these narrowly stated limitations and provider-log visibility.
 
 ## References
 

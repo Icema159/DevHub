@@ -2,9 +2,14 @@
 
 ## Status
 
+Current reviewer reference: [technical-documentation.md](technical-documentation.md), refreshed
+2026-08-26 from code and operator-confirmed production behavior. The operator confirms five Railway
+services and the main auth/email/upload/processing/RAG/cleanup path work. This refresh did not run
+live production checks; exact platform settings and broader acceptance remain separately verifiable.
+
 The initial high-level architecture was approved during Phase 1. It defines the current component boundaries and technology direction for implementation. It is not immutable: changes must be justified by product evidence and recorded in an Architecture Decision Record (ADR).
 
-The implementation foundation now includes npm workspaces, shared TypeScript and code-quality configuration, a React 19 and Vite 8 web entry point, local PostgreSQL and Redis services through Docker Compose, applied Prisma migrations, generated Prisma Client, and an Express API with revocable server-side sessions, email verification, authentication abuse protection, authorization, PDF upload, owner-scoped document listing/detail/deletion, semantic retrieval, conversations, and grounded answer generation. Original files are stored through an object-storage abstraction, with local filesystem and Cloudflare R2 S3-compatible adapters available to both the API and worker for write, read, and cleanup responsibilities. The API submits identifier-only document jobs to BullMQ. The worker extracts and chunks PDFs, submits a separate embedding job, calls OpenAI through a shared embedding abstraction, and stores validated 1,536-dimensional vectors in pgvector before marking the document `READY`. Documents move through `PENDING` → `PROCESSING` → `CHUNKS_READY` → `EMBEDDING` → `READY`, or to `FAILED` with a safe processing error. Soft deletion immediately hides a document and blocks retrieval; a separate cleanup job removes storage and database data permanently. Authenticated follow-up questions combine a bounded, current-conversation history with the current question for retrieval, then retrieve up to five owner-scoped, non-deleted `READY` document chunks by cosine similarity. The answer prompt receives dialogue history separately from the labelled document context, and the document chunks remain the only factual source. Both messages, citations, and generation metadata are persisted. Conversation lists are owner-scoped and paginated, include the latest USER-message preview, and receive a short best-effort generated title after their first successful turn. The web workspace provides a light-only Tailwind CSS design system, responsive authenticated shell, centralized Axios API client, real credential forms, HttpOnly-cookie session restoration, verification-required/resend/result UX, protected routing, safe session-expiration handling, an API-backed Dashboard, an owner-scoped Documents library with validated PDF upload, a real owner-scoped Document Details page with safe confirmed Retry and deletion, and a responsive Conversations Workspace with explicit creation, durable selected routes, persisted message sending, and accessible backend-authoritative source cards. The UI component showcase remains available. PDF viewing/download, a public session-management UI, streaming, and long-term memory remain outstanding.
+The implementation foundation now includes npm workspaces, shared TypeScript and code-quality configuration, a React 19 and Vite 8 web entry point, local PostgreSQL and Redis services through Docker Compose, applied Prisma migrations, generated Prisma Client, and an Express API with revocable server-side sessions, email verification, authentication abuse protection, authorization, PDF upload, owner-scoped document listing/detail/deletion, semantic retrieval, conversations, and grounded answer generation. Original files are stored through an object-storage abstraction, with local filesystem and Cloudflare R2 S3-compatible adapters available to both the API and worker for write, read, and cleanup responsibilities. The API submits identifier-only document jobs to BullMQ. The worker extracts and chunks PDFs, submits a separate embedding job, calls OpenAI through a shared embedding abstraction, and stores validated 1,536-dimensional vectors in pgvector before marking the document `READY`. Documents move through `PENDING` → `PROCESSING` → `CHUNKS_READY` → `EMBEDDING` → `READY`, or to `FAILED` with a safe processing error. Soft deletion immediately hides a document and blocks retrieval; a separate cleanup job removes storage and database data permanently. Authenticated follow-up questions combine a bounded, current-conversation history with the current question for retrieval, then retrieve up to five owner-scoped, non-deleted `READY` document chunks by cosine similarity. The answer prompt receives dialogue history separately from the labelled document context, and the document chunks remain the only factual source. Both messages, citations, and generation metadata are persisted. Conversation lists are owner-scoped and paginated, include the latest USER-message preview, and receive a short best-effort generated title after their first successful turn. The web workspace provides the dark V4 "Liquid Glass" Tailwind CSS design system (covering Auth, the authenticated shell, and every authenticated page), a responsive authenticated shell, centralized Axios API client, real credential forms, HttpOnly-cookie session restoration, verification-required/resend/result UX, protected routing, safe session-expiration handling, an API-backed Overview page, an owner-scoped Documents library with validated PDF upload, a real owner-scoped Document Details page with safe confirmed Retry and deletion, and a responsive Threads workspace with explicit creation, durable selected routes, Server-Sent Events streamed responses (see "Conversation streaming (SSE)" below), and accessible backend-authoritative source cards. The UI component showcase is registered only in development builds. PDF viewing/download, a public session-management UI, and long-term memory remain outstanding.
 
 Phase 13B.5.2 adds a containment boundary inside the existing worker architecture: stored PDFs are
 revalidated, parsed in a termination-capable Node Worker Thread, and checked against centralized
@@ -32,11 +37,13 @@ original URI intact, to a private Express API service. The Worker is private and
 consumes the three existing BullMQ queues. API and Worker share private pgvector-enabled PostgreSQL,
 private Redis, R2, and provider configuration; only the API runs `prisma migrate deploy`.
 
-Production environment builders reject localhost service fallbacks, local object storage, missing
+Production environment builders reject missing service configuration that would otherwise use local defaults, local object storage, missing
 R2/OpenAI configuration, incompatible public origins, and an unspecified proxy-trust policy. Redis
 connections allow either IP family for private DNS. Express uses a small explicit trusted-hop count,
-never unrestricted forwarded-header trust. The real Railway hop count, database extension, service
-health, secrets, and smoke tests remain deployment-time checks in Phase 14.3. See
+never unrestricted forwarded-header trust. Presence checks do not prove credential validity, private
+network exposure, TLS, R2 endpoint correctness, or provider/model availability. The actual Railway
+hop count, database version, migration state, and broader deployment acceptance require operational
+evidence beyond this code audit. See
 [`deployment.md`](deployment.md).
 
 ## High-level flow
@@ -116,7 +123,7 @@ All three BullMQ queues currently allow three total attempts with exponential ba
 2. Setting `deletedAt` hides the document from list/detail queries and excludes it from pgvector retrieval immediately.
 3. The API submits an identifier-only `document.delete` job. If enqueue fails, it compensates by clearing only the exact timestamp written by that request and returns a safe `503`.
 4. The cleanup worker reloads only a matching soft-deleted document, deletes its private local/R2 object, then transactionally deletes chunks (including vectors and live source links) followed by the document row.
-5. Missing objects, chunks, jobs, and rows are idempotent success cases. Other failures are thrown so BullMQ can retry; an exhausted cleanup job leaves the soft-deleted row hidden for operational recovery.
+5. Missing objects, chunks, and rows are idempotent success cases. A missing Redis job does not repair a stale DB row. Other failures are thrown so BullMQ can retry; an exhausted cleanup job leaves the soft-deleted row hidden for operational recovery. The all-row `(userId, fileHash)` unique constraint still applies until hard deletion, so an identical re-upload can be rejected even though the old document is no longer visible.
 6. Processing and embedding transitions require `deletedAt IS NULL`. If deletion races with active work, completion transactions roll back or return a safe deleted outcome without recreating chunks or vectors.
 
 ### Question and answer flow
@@ -151,6 +158,45 @@ complete; only a newly persisted matching USER message clears the draft.
 
 The AI provider never determines ownership or authorization. The application filters every retrieval operation before document content is sent to the provider.
 
+### Conversation streaming (SSE)
+
+The product's real Threads UI calls `POST /api/conversations/:conversationId/messages/stream`
+instead of the non-streaming endpoint above. Authentication, CSRF, email verification, and the
+per-IP AI rate limit apply identically to both routes; a request that fails ownership or
+authentication never reaches SSE -- it gets a normal JSON error response, because the controller
+only switches the connection into `text/event-stream` mode after the underlying generator yields
+its first event successfully. Once that first event is written, the response is committed to SSE:
+`Content-Type: text/event-stream; charset=utf-8`, `Cache-Control: private, no-cache, no-store,
+must-revalidate`, `Connection: keep-alive`, headers flushed immediately before the first write.
+
+Each frame is `event: <type>\ndata: <json>\n\n`. A successful turn emits, in order:
+
+- `user_message` -- the persisted USER message (so the client can render it without waiting);
+- `status` (`phase: "retrieving"`) -- retrieval has started;
+- `status` (`phase: "generating"`) -- retrieval finished, generation has started;
+- one or more `delta` events -- incremental answer text as the provider streams it (a
+  zero-retrieved-context turn still emits exactly one `delta` carrying the fixed
+  insufficient-context answer, never a live provider call);
+- `completed` -- the persisted ASSISTANT message and source DTOs, the same shape the
+  non-streaming endpoint returns.
+
+If the browser disconnects mid-stream, the controller's `response.once('close', ...)` handler
+aborts the in-flight generator via `AbortSignal`, which the AI-budget layer treats the same as a
+provider failure: the reservation is still settled (as a conservative estimate) rather than left
+dangling. If an unexpected failure happens *after* the first event has already been written, the
+stream emits one final `event: error` frame (`{ code, message, status }`) before the connection
+closes; the raw error is never serialized into that frame or into server logs -- only a name/message
+pair extracted through the same safe-metadata convention used elsewhere in the API.
+
+Heartbeat/idle timing was investigated for this ticket rather than assumed: Railway closes an SSE
+connection after 5 minutes with no bytes transferred (absolute cap 15 minutes even with a
+heartbeat, per Railway's own SSE guidance). The two possible silent windows in this flow --
+`status: retrieving` to `status: generating` (bounded by the embedding provider's own request
+timeout, 30s), and `status: generating` to the first `delta` (bounded by the chat provider's own
+request timeout, 60s) -- are both far inside that 5-minute window even in the worst case, and nothing
+here runs anywhere close to the 15-minute absolute cap. No heartbeat frame is implemented today;
+this should be revisited only if generation latency grows materially.
+
 ## Component responsibilities
 
 ### React web application
@@ -178,7 +224,7 @@ The implemented frontend foundation includes:
   the current list page and uses one generic missing/foreign/deleted presentation;
 - an owner-scoped Chat thread that renders persisted USER/ASSISTANT messages as plain text and
   submits one validated 4,000-character question at a time without sending browser history;
-- a static `/ui-kit` route that demonstrates component variants, states, loading, empty, feedback, and pagination behavior;
+- a `/ui-kit` route (development builds only, not registered in production) that demonstrates component variants, states, loading, empty, feedback, and pagination behavior;
 - API client, auth service/store, validation, route, and component interaction tests with Vitest, React Testing Library, and jsdom.
 
 Frontend responsibilities are separated by directory: `components/ui` owns product-neutral
@@ -257,7 +303,7 @@ INVALID_DOCUMENT_STATE` performs one controlled Details refresh with neutral fee
 queue/server errors preserve the visible Failed DTO for explicit resubmission. No automatic
 network retry, status polling, queue progress, or worker-stage UI is introduced.
 
-The visual system is deliberately light-only in this phase. Liquid Glass-inspired gradients and translucency provide atmosphere around readable, mostly solid content surfaces rather than replacing information hierarchy.
+The visual system is the dark V4 "Liquid Glass" identity: readable, mostly solid content surfaces sit over gradient and translucency atmosphere rather than atmosphere replacing information hierarchy. This superseded the light-only visual system described in earlier phases of this project; see docs/ui-redesign/tasks/UR-001-liquid-glass-foundation for that experiment's history and promotion to production.
 
 The frontend cannot read the opaque session cookie and does not persist a token in Zustand,
 localStorage, sessionStorage, URL parameters, or browser-readable cookies. Axios sends the
@@ -419,12 +465,27 @@ File reading, text extraction, chunking, embedding generation, lifecycle transit
   exists only until cleanup queue acceptance so explicit enqueue compensation cannot overrun quota.
 - `AiTurnReservation` rows enforce 30 successfully persisted answer turns in a rolling 24-hour
   window. The assistant write and turn commit share one transaction; deterministic no-context and
-  failed turns release their reservation.
+  failed turns release their reservation. A model-generated insufficient-context response after
+  non-empty retrieval currently follows normal persistence and does commit a turn.
 - `AiBudgetPeriod`, `AiBudgetReservation`, and `AiUsageRecord` serialize a $20 UTC monthly OpenAI
   budget using integer micro-USD. Every question embedding, answer, title, and document embedding is
   reserved before its provider path and reconciled from provider usage or a conservative estimate.
 - Provider-side retries are disabled so hidden SDK attempts cannot bypass accounting. The API and
   worker remain responsible for explicit, observable retry behavior.
+
+The monthly amount is a configurable application-side estimated admission budget, not a guaranteed
+provider invoice ceiling. Unknown model pricing fails before provider work. Empty retrieval skips
+answer generation, not its already completed query embedding or a possible first-turn title call.
+
+### Operational qualification from the documentation audit
+
+The 2026-08-26 code inspection found no automatic reconciliation or orphan-object repair service.
+Manual processing Retry uses a fresh ID, but embedding enqueue uses a fixed per-document ID; a
+retained failed embedding job can collide. Failures before the EMBEDDING transition can also miss
+its guarded terminal update. These are risks requiring targeted recovery tests, not newly
+reproduced production incidents or fixes in this documentation task. Generation errors are mapped
+to `AI_PROVIDER_UNAVAILABLE` without preserving their original diagnostic cause in this path.
+See [technical reference, operational section](technical-documentation.md#33-operacinės-klaidos-ir-atkūrimas).
 
 ### AI provider and OpenAI
 
@@ -443,7 +504,7 @@ File reading, text extraction, chunking, embedding generation, lifecycle transit
 - post-generation validation rejects missing or unknown labels and persists only sources cited by the answer;
 - source text and document names are treated as untrusted data rather than model instructions;
 - empty retrieval returns a deterministic response without calling the answer provider;
-- up to six prior USER/ASSISTANT messages (three exchanges) from the active owner-scoped conversation are serialized under a strict 6,000-character limit; newest messages are retained when the limit is exceeded;
+- up to six prior USER/ASSISTANT messages (approximately three exchanges, not enforced complete pairs) from the active owner-scoped conversation are serialized under a strict 6,000-character limit; newest messages are retained when the limit is exceeded;
 - bounded dialogue context is used for reference resolution in retrieval and generation, but it is separated from retrieved chunks, cannot be cited, and is explicitly not a factual source;
 - no other conversation, user, long-term memory, summary, or message embedding participates in the turn;
 - a failed turn triggers best-effort removal of its new USER message; a process crash can still leave a partial turn until explicit turn-state recovery is designed.

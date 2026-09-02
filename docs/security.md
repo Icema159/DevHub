@@ -1,7 +1,9 @@
 # Security model
 
 This document records the implemented security boundaries that were verified through Phase 13B.5.2.
-It describes current guarantees, not controls planned for later Phase 13 work.
+It describes implemented controls and their limits, not a formal security certification. The
+2026-08-26 [technical reference](technical-documentation.md) separates code/test-source inspection,
+operator-confirmed production behavior, and deployment properties not independently verified.
 
 ## Identity and authorization boundary
 
@@ -69,8 +71,9 @@ Resource admission is split by trust boundary:
   original `sizeBytes`, and two active pipelines in `PENDING`, `PROCESSING`, `CHUNKS_READY`, or
   `EMBEDDING`. `READY`, `FAILED`, foreign, and soft-deleted documents do not consume a processing
   slot. Retry consumes only a processing slot, not another document or storage allowance.
-- A successful AI turn means one grounded assistant answer durably persisted for the authenticated
-  user's active conversation. Question embedding, answer generation, and best-effort title creation
+- An admitted AI turn is committed when the non-empty-retrieval generation path durably persists
+  its assistant response for the authenticated user's active conversation, including a model's
+  insufficient-context response. Question embedding, answer generation, and best-effort title creation
   are still one turn. Up to 30 committed or actively reserved turns are allowed per rolling 24
   hours. Invalid, foreign, deterministic no-context, provider-failed, and persistence-failed turns
   do not commit the user allowance.
@@ -110,25 +113,28 @@ Auth, document, conversation, and search responses use `Cache-Control: private, 
 Application responses set a restrictive self-only CSP, deny framing, objects, and base-URL changes,
 disable MIME sniffing, minimize referrer disclosure, and deny unused camera, microphone, and
 geolocation capabilities. HSTS is emitted only for a validated HTTPS production environment. The
-Vite production-preview configuration applies the matching document policy; the eventual static
-host or edge must preserve those headers in the real deployment.
+Vite production-preview configuration applies the matching document policy; the checked-in Caddy
+configuration provides those headers for production frontend documents while caching hashed
+static assets separately.
 
 The Phase 14.2 production boundary uses one public Caddy Web origin. Caddy serves static assets and
 proxies `/api/*` to the private API while preserving the route, cookies, `Origin`, CSRF headers, and
 API response headers. Express trusts only an explicit bounded number of proxy hops. The exact
 Railway chain must be verified before launch so a client-controlled forwarding header cannot spoof
 the IP identity used by rate limits. Production configuration fails closed on missing or insecure
-public origins, local storage, missing private Redis, missing R2 credentials, or missing OpenAI
-credentials. See [`deployment.md`](deployment.md).
+public origins, local storage, missing Redis configuration, missing R2 credentials, or missing
+OpenAI credentials. These presence/format checks do not establish real private exposure, TLS,
+credential validity, R2 endpoint reachability, or model availability. See [`deployment.md`](deployment.md).
 
 ## Phase 13B.5.2 PDF containment boundary
 
 PDF processing is bounded independently of the upload-size and owner-quota controls. One
 central configuration limits a PDF to 150 pages, 1,000,000 extracted characters, 1,000 chunks, and
 30 seconds of parser execution. The parser runs in a dedicated Node Worker Thread with explicit
-heap and stack resource limits. A timeout terminates that thread; a parser exception or thread
-failure is contained without terminating or blocking the BullMQ process, embedding consumer, or
-cleanup consumer.
+heap and stack resource limits. A timeout terminates that thread; parser exceptions and thread
+failure events are handled outside the main event loop so ordinary parser failures do not stop
+the other consumers. This is not a hard cap on whole-process RSS or native allocations, nor an
+absolute guarantee against an operating-system-level process kill.
 
 Before buffering object content, the storage adapter compares local file metadata or R2
 `ContentLength` with the authoritative `Document.sizeBytes` value, then verifies the final byte
@@ -152,7 +158,8 @@ of multipart parts before storage, database, or queue work.
   service rules, DTOs, and regression tests, so every future private resource path must preserve the
   same pattern.
 - Redis is trusted infrastructure. Production Redis must be private, authenticated, and use TLS
-  where supported. Local Docker exposes an unauthenticated development instance on localhost only.
+  where supported. Local Docker publishes an unauthenticated development Redis on port 6379
+  without an explicit loopback bind; the Compose file is not a production security configuration.
 - Citation JSON is a durable, server-generated snapshot. An owner may still read a citation in their
   own historical conversation after the source document is deleted; the live chunk relation and all
   new retrieval access are removed. This is intentional and does not grant source-file access.

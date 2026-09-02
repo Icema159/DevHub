@@ -4,6 +4,13 @@ Each phase should introduce the minimum new complexity needed to understand the 
 
 ## Current position
 
+As of 2026-08-26, the operator confirms the five Railway services and the main production
+registration/verification/upload/R2/Worker/embedding/retrieval/RAG/citation/cleanup path are working.
+Broader Phase 14.3B deployment acceptance is not declared complete by this documentation refresh.
+See [the technical reference](technical-documentation.md) for evidence boundaries and remaining
+recovery/observability work. Delivery entries and test totals below record historical phase results,
+not fresh test execution or current future-work instructions.
+
 - Phase 0 product definition is complete.
 - Phase 1 has completed the initial component, persistence, storage, vector search, and AI provider decisions. The accepted decisions are recorded in `docs/decisions/`.
 - Delivery task 5.3 initialized the npm workspaces monorepo and package scaffolds.
@@ -48,7 +55,7 @@ Each phase should introduce the minimum new complexity needed to understand the 
 - Security task 13B.2 is complete. A two-agent read-only audit found no Critical, High, or Medium owner-isolation vulnerability. Adversarial API, repository, pgvector, and worker tests now prove generic foreign-resource denial, parent-scoped message and citation access, pre-ranking vector ownership filters, soft-delete exclusion, and rejection of forged job ownership. Public conversation history excludes internal `SYSTEM` rows, and assistant source persistence revalidates owner, deletion, and `READY` state. The current guarantees and remaining trusted boundaries are recorded in `docs/security.md`.
 - Security task 13B.3 is complete. A PostgreSQL-backed ResourceGuard now atomically enforces 25 non-deleted documents, 150 MiB of original PDF bytes, two active document pipelines, and 30 successful AI answer turns per rolling 24 hours for each authenticated owner. Redis fixed-window controls bound upload and AI attempts per trusted Express IP and fail closed only on those protected expensive routes. Every OpenAI question-embedding, answer, title, and document-embedding path reserves against a durable $20 UTC monthly application budget and records an integer-micro-USD usage estimate. Budget-blocked embedding jobs remain `CHUNKS_READY` and move to a bounded BullMQ delay rather than becoming `FAILED`; reads, authentication, deletion, and cleanup remain operational. Minimal existing UI error surfaces explain limit denials without adding a usage dashboard.
 - Security task 13B.5.2 is complete. Multipart complexity is bounded before upload business logic; stored size and signature are revalidated; PDF parsing runs in a termination-capable Worker Thread; centralized 150-page, 1,000,000-character, 1,000-chunk, and 30-second limits fail safely and without BullMQ retries; and rejected files cannot create chunks, embedding work, provider calls, or AI-budget reservations.
-- Refresh-token behavior, extracted-content/metadata search, streaming, and long-term memory have not been created yet.
+- Refresh-token behavior, extracted-content/metadata search, and long-term memory have not been created yet. Chat streaming has since shipped (see below).
 - Remaining task-specific decisions will be made before the phase that needs them.
 
 ## Numbering note
@@ -75,7 +82,7 @@ Status: Initial high-level architecture and core technology decisions completed.
 
 ## Phase 2 — Data model
 
-Status: The initial Prisma models, relations, ownership rules, document/conversation soft deletion, constraints, and indexes are implemented. Local migrations enable pgvector, add the processing and embedding lifecycle states, constrain document-chunk vectors to 1,536 dimensions, and add `Document.deletedAt`. A standalone ERD, vector index strategy, and production migration workflow remain outstanding.
+Status: Prisma models, ownership relations, soft deletion, sessions, verification, quota/budget records, constraints, and migrations are implemented. Migrations enable pgvector and constrain vectors to 1,536 dimensions. The API-owned production `prisma:migrate:deploy` workflow exists. A standalone ERD, measured vector-index strategy, and repeatable deployment/restore acceptance remain outstanding.
 
 - identify entities and relationships;
 - design ownership and deletion behavior;
@@ -93,7 +100,7 @@ Status: Repository scaffolding, shared developer tooling, environment templates,
 
 ## Phase 4 — Authentication and authorization
 
-Status: Registration, credential verification, seven-day revocable server-side sessions, HttpOnly cookie transport, PostgreSQL-backed authentication middleware, current-user lookup, authoritative logout, email verification, authentication abuse controls, and the ownership-authorization foundation are implemented. The web client has matching Login/Register/Verify flows, startup session restoration, protected/public route guards, verification-required guidance, resend, session-expiration handling, and logout without exposing the opaque credential to JavaScript. A public session-management UI and the remaining Phase 13 security controls are outstanding.
+Status: Registration, credential verification, seven-day revocable server-side sessions, HttpOnly cookie transport, PostgreSQL-backed authentication middleware, current-user lookup, authoritative logout, email verification, authentication abuse controls, and ownership authorization are implemented. The web client has matching Login/Register/Verify flows, session restoration, route guards, resend, session-expiration handling, and logout without exposing the opaque credential. Browser CSRF/Origin/header protections, durable quotas/budgets, and PDF containment are also implemented. A public session-management UI and further operational/security acceptance remain outstanding.
 
 - registration and sign-in;
 - session lifecycle;
@@ -121,7 +128,7 @@ Status: The API producers, identifier-only processing/embedding/deletion contrac
 
 ## Phase 7 — Search
 
-Status: The semantic retrieval foundation is implemented: authenticated queries are embedded with the same model used for chunks and are matched against only the user's `READY` documents using exact pgvector cosine search. Metadata and keyword search, relevance evaluation, thresholds, pagination, and a measured vector-index decision remain outstanding.
+Status: The semantic retrieval foundation is implemented: authenticated queries use the same embedding model as chunks and exact pgvector cosine search over only the owner's non-deleted READY documents. Document-list filename search, status filters, and pagination are already implemented. Extracted-content keyword search, metadata filters, semantic-result pagination, relevance evaluation, thresholds, and a measured vector-index decision remain outstanding.
 
 - metadata and keyword search first;
 - database full-text search if justified;
@@ -130,7 +137,7 @@ Status: The semantic retrieval foundation is implemented: authenticated queries 
 
 ## Phase 8 — Grounded AI answers
 
-Status: The backend RAG answer flow and conversation foundation are implemented. Authenticated questions create owner-scoped USER messages, combine up to three recent exchanges from the same conversation with the current question for retrieval understanding, retrieve authorized chunks, construct separated dialogue and labelled document contexts, generate through a shared OpenAI Responses API adapter, and atomically persist the ASSISTANT message with citation snapshots, source-chunk links, and usage metadata. The bounded history has a strict 6,000-character ceiling and is not a factual source or long-term memory. Conversation sidebar data includes a best-effort generated title, latest USER-message preview, and owner-scoped pagination. The frontend has a real paginated Conversations Workspace, explicit creation, durable selected routes, persisted message history, validated duplicate-safe sending, and backend-authoritative source cards. Phase 11.7D is complete: real-provider integration and controlled-browser acceptance cover the grounded path, conversation lifecycle and navigation, citations, insufficient context, owner isolation, delayed route switching, exact content-only message requests, and citation edge cases. Streaming, formal citation-quality evaluation, and stronger crash recovery remain future work rather than Phase 11.7D acceptance blockers.
+Status: The backend RAG answer flow and conversation foundation are implemented. Authenticated questions create owner-scoped USER messages, combine up to three recent exchanges from the same conversation with the current question for retrieval understanding, retrieve authorized chunks, construct separated dialogue and labelled document contexts, generate through a shared OpenAI Responses API adapter, and atomically persist the ASSISTANT message with citation snapshots, source-chunk links, and usage metadata. The bounded history has a strict 6,000-character ceiling and is not a factual source or long-term memory. Conversation sidebar data includes a best-effort generated title, latest USER-message preview, and owner-scoped pagination. The frontend has a real paginated Conversations Workspace, explicit creation, durable selected routes, persisted message history, validated duplicate-safe sending, and backend-authoritative source cards. Phase 11.7D is complete: real-provider integration and controlled-browser acceptance cover the grounded path, conversation lifecycle and navigation, citations, insufficient context, owner isolation, delayed route switching, exact content-only message requests, and citation edge cases. Formal citation-quality evaluation and stronger crash recovery remain future work rather than Phase 11.7D acceptance blockers. Streaming, listed as future work at the time of Phase 11.7D, has since shipped: the frontend now calls the Server-Sent Events endpoint (see docs/architecture.md's "Conversation streaming (SSE)" section).
 
 - retrieve authorized passages;
 - construct bounded model context;
@@ -221,6 +228,10 @@ unreachable Prisma CLI/tooling dependencies. Phase 14.3B has brought the five Ra
 online and is completing production acceptance. Railway verification email delivery now uses the
 existing provider abstraction with Resend HTTPS; optional SMTP remains available outside that
 deployment.
+
+## Dark V4 "Liquid Glass" identity and Chat streaming (after Phase 14)
+
+Status: complete. (Numbered as a phase deliberately left open here -- confirm the team's internal phase number before treating this heading as canonical.) The design experiment recorded in `docs/ui-redesign/tasks/UR-001-liquid-glass-foundation` was promoted to production: the dark V4 "Liquid Glass" identity now covers Sign In/Sign Up, the authenticated shell, Overview, Documents, Document Details, and Threads, superseding the light-only visual system described in Phase 12 above. Chat responses stream over Server-Sent Events instead of arriving as a single response (see docs/architecture.md). `/ui-kit` is registered only in development builds.
 
 - automated lint, test, type-check, and build gates;
 - structured logs, request/job correlation, metrics, alerts, and failure-recovery exercises;

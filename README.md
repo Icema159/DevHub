@@ -8,15 +8,24 @@ Developers accumulate README files, PDFs, architecture notes, API specifications
 
 ## The product
 
-The platform will let a developer:
+The implemented MVP lets a developer:
 
 - create a private personal knowledge library;
-- organize documents with flexible metadata such as tags;
-- upload supported technical documents;
-- search document names and extracted content;
-- ask questions about selected documents or the personal library;
-- receive answers with references to the original sources;
-- track document processing status and failures.
+- upload PDFs and search their filenames with status filtering;
+- ask questions across their non-deleted, READY personal library;
+- receive grounded answers with citation snapshots and Document Details navigation;
+- track processing states, restart FAILED documents, and request asynchronous deletion.
+
+Tag management, extracted-content keyword search, selected-document retrieval, and original-PDF
+viewing/download remain outside the current implementation.
+
+For a reviewer, start with the two-level [technical documentation](docs/technical-documentation.md)
+and its [PDF edition](docs/Developer-Knowledge-Hub-Technical-Documentation.pdf). The
+[refresh gap analysis](docs/technical-documentation-gap-analysis.md) records what changed from the
+older technical PDF. As of 2026-08-26, the operator confirms the five-service Railway production
+path works, including Resend verification, R2 ingestion, embeddings, RAG, citations, and successful
+cleanup. This documentation refresh did not repeat production checks or application tests;
+phase-specific QA results below are historical snapshots.
 
 ## First target user
 
@@ -32,7 +41,20 @@ Product definition and the initial architecture decisions are complete. The repo
 
 The API package now has its application entry point, environment and Prisma integration, middleware boundaries, revocable server-side sessions, email verification, Redis-backed authentication and expensive-route abuse protection, ownership authorization, protected PDF upload, owner-scoped document list/detail/delete/retry operations, semantic retrieval, and conversation-backed grounded answers. Uploaded PDFs are limited to 10 MiB, checked by MIME type and signature, hashed with SHA-256, stored through an object-storage abstraction, recorded as `PENDING` in PostgreSQL, and submitted to BullMQ using an identifier-only job contract from the shared package. A PostgreSQL-backed ResourceGuard atomically limits each owner to 25 non-deleted documents, 150 MiB of original PDF bytes, two active processing pipelines, and 30 successfully persisted AI answer turns in a rolling 24-hour window. Redis independently limits upload attempts to 20/IP/hour and AI attempts to 60/IP/hour. The worker downloads each PDF, extracts page text, creates ordered chunks, then submits a separate embedding job. The embedding worker calls the shared AI package backed by OpenAI `text-embedding-3-small`, validates 1,536-dimensional vectors, and stores them with model metadata in PostgreSQL pgvector before marking the document `READY`. Every OpenAI question embedding, answer, title, and document-embedding operation is protected by a durable $20 UTC monthly budget reservation and integer-micro-USD usage ledger. Budget-blocked embedding work is delayed while remaining `CHUNKS_READY`; deletion and cleanup stay available. A failed BullMQ attempt is not treated as a failed document: retryable processing stays in an active state without a stored error until the configured attempts are exhausted, while established unrecoverable errors fail immediately with a safe message. An owner can manually restart a terminally `FAILED` document from the beginning under the same document ID; the API removes previous chunk/vector artifacts, moves it to `PROCESSING`, and submits a fresh `document.process` job. Deleting a document sets `deletedAt` immediately, excluding it from list/detail reads and all new semantic retrieval, then submits a `document.delete` job that removes the private object, chunks, embeddings, and database row asynchronously. The API combines the current question with a bounded, owner-scoped window of recent messages to improve follow-up retrieval, embeds that contextual query, retrieves up to five owner-scoped chunks by cosine similarity, builds a source-labelled document context, and calls a provider-neutral answer interface. Conversation history is used only for dialogue understanding; retrieved documents remain the factual source. USER and ASSISTANT messages, citation snapshots, source-chunk relations, and generation usage metadata are persisted in PostgreSQL. After the first successful conversation turn, the existing chat provider is reused best-effort to create a short title; conversation lists are owner-scoped, paginated, and include a bounded preview of the latest USER message. Local development uses a filesystem storage adapter; Cloudflare R2 is the configured production adapter.
 
-The `apps/web` workspace now has a React 19, Vite 8, and TypeScript entry point. Its light-only visual foundation uses Tailwind CSS 4 CSS-first semantic tokens, self-hosted Inter fonts, Lucide icons, reusable typed components, and a responsive authenticated application shell with a desktop sidebar and accessible mobile drawer. A centralized Axios client sends the backend's HttpOnly authentication cookie, normalizes public errors, and supports feature-specific API modules. Zustand manages only the safe current-user DTO and explicit session state; it never receives or stores the opaque session credential. Real Login and Register pages mirror the backend credential rules, `/auth/me` restores sessions after refresh, route guards protect `/dashboard`, `/documents`, `/documents/:documentId`, `/chat`, and `/chat/:conversationId`, and the App Shell exposes the real authenticated identity, email-verification state, resend action, and logout action. `/verify-email` consumes a one-time token from the URL fragment, removes it from browser history, and refreshes authoritative account state after success. `/dashboard` composes the existing document and conversation endpoints, while `/documents` provides a real owner-scoped library with server-side filename search, public status filters, pagination, manual refresh, and validated PDF upload. Its semantic document links open a real owner-scoped details page that safely presents public metadata, grouped lifecycle status, failure information, explicit manual refresh, confirmed Retry for `FAILED` documents, and an owner-scoped Delete flow with accessible confirmation and accurate asynchronous-cleanup feedback. `/chat` provides an owner-scoped Conversations Workspace with URL-backed pagination, explicit server-confirmed creation, direct conversation routes, nullable title/preview fallbacks, stale-response protection, persisted USER/ASSISTANT history, an accessible multiline message composer, and validated source cards for grounded ASSISTANT messages. Successful turns are reloaded authoritatively so server IDs, timestamps, titles, previews, sources, and ordering remain canonical. `/ui-kit` remains the static component showcase. Vitest, React Testing Library, and jsdom cover component, API client, auth service/store, Dashboard, Documents, and Conversations data mapping, request cancellation and stale-response handling, upload validation, Retry/Delete/create/send lifecycles, plain-text message rendering, source validation and navigation, reconciliation, and routing behavior. PDF viewing/download, streaming, Markdown rendering, long-term memory, and a public session-management UI are not implemented in the web application yet.
+The `apps/web` workspace now has a React 19, Vite 8, and TypeScript entry point. Its visual foundation -- now the dark V4 "Liquid Glass" identity across every authenticated page and Auth -- uses Tailwind CSS 4 CSS-first semantic tokens, self-hosted Inter fonts, Lucide icons, reusable typed components, and a responsive authenticated application shell with a desktop sidebar and accessible mobile drawer. A centralized Axios client sends the backend's HttpOnly authentication cookie, normalizes public errors, and supports feature-specific API modules. Zustand manages only the safe current-user DTO and explicit session state; it never receives or stores the opaque session credential. Real Login and Register pages mirror the backend credential rules, `/auth/me` restores sessions after refresh, route guards protect `/dashboard`, `/documents`, `/documents/:documentId`, `/chat`, and `/chat/:conversationId`, and the App Shell exposes the real authenticated identity, email-verification state, resend action, and logout action. `/verify-email` consumes a one-time token from the URL fragment, removes it from browser history, and refreshes authoritative account state after success. `/dashboard` composes the existing document and conversation endpoints, while `/documents` provides a real owner-scoped library with server-side filename search, public status filters, pagination, manual refresh, and validated PDF upload. Its semantic document links open a real owner-scoped details page that safely presents public metadata, grouped lifecycle status, failure information, explicit manual refresh, confirmed Retry for `FAILED` documents, and an owner-scoped Delete flow with accessible confirmation and accurate asynchronous-cleanup feedback. `/chat` provides an owner-scoped Conversations Workspace with URL-backed pagination, explicit server-confirmed creation, direct conversation routes, nullable title/preview fallbacks, stale-response protection, persisted USER/ASSISTANT history, an accessible multiline message composer, and validated source cards for grounded ASSISTANT messages. Successful turns are reloaded authoritatively so server IDs, timestamps, titles, previews, sources, and ordering remain canonical. `/ui-kit` remains the static component showcase. Vitest, React Testing Library, and jsdom cover component, API client, auth service/store, Dashboard, Documents, and Conversations data mapping, request cancellation and stale-response handling, upload validation, Retry/Delete/create/send lifecycles, plain-text message rendering, source validation and navigation, reconciliation, and routing behavior. PDF viewing/download, Markdown rendering, long-term memory, and a public session-management UI are not implemented in the web application yet. Real-time chat streaming (Server-Sent Events) now is: see "Current UI (V4)" below and [docs/architecture.md](docs/architecture.md) for the wire contract.
+
+### Current UI (V4)
+
+The dark "Liquid Glass" V4 visual identity is the shipped product UI, not a preview: it covers
+Sign In/Sign Up, the authenticated shell, Overview, Documents, Document Details, and Threads.
+"Overview" and "Threads" are the current product-facing terms for what the codebase's routes and
+components still internally call Dashboard (`/dashboard`, `DashboardPage`) and Chat (`/chat`,
+`ChatPage`) -- both names appear in this document depending on whether the surrounding text is
+describing the product (Overview/Threads) or the implementation (Dashboard/Chat). Chat responses
+now stream over Server-Sent Events rather than arriving as a single response; see
+[docs/architecture.md](docs/architecture.md) for the event contract. `/ui-kit`, the static
+component showcase referenced throughout this document, is registered only in development builds
+and is not reachable in production.
 
 ### PDF containment
 
@@ -74,7 +96,7 @@ process is needed.
 
 ## Web application foundation
 
-The current frontend milestone establishes the shared visual language and reusable interaction primitives before product pages are built:
+The frontend foundation supplies the shared visual language and reusable interaction primitives used by the implemented product pages:
 
 - Tailwind CSS utilities and semantic design tokens are the primary styling system;
 - readable solid surfaces sit over a restrained Liquid Glass-inspired background atmosphere;
@@ -265,8 +287,7 @@ For local development, copy the frontend example when a custom API location is n
 cp apps/web/.env.example apps/web/.env
 ```
 
-`VITE_API_BASE_URL` is public browser configuration, defaults locally to
-`http://localhost:3000`, and must never contain secrets.
+`VITE_API_BASE_URL` is public browser configuration and must never contain secrets. Left unset (the local default), the client calls the API same-origin at `/api`, and the Vite dev server's own proxy forwards those requests to the local API at `http://localhost:3000` -- mirroring the same-origin topology production uses behind Caddy. Set it explicitly only to point the web client at a different origin (for example a remote API).
 
 Production uses a same-origin Web gateway: Caddy serves the compiled React application and proxies
 `/api/*` to the private API without rewriting the path. Phase 14.3A now documents the exact Railway
@@ -392,8 +413,8 @@ Solid Knowledge surfaces for grounded ASSISTANT answers, stacked evidence-orient
 Elevated Interaction Glass for the floating Composer. The desktop split begins at 1280 px; at 1024
 px and below the selected route uses the available width instead of compressing the thread into a
 third narrow column. Controlled browser QA passed at 1440 × 900, 1280 × 800, 1024 × 768, 768 ×
-1024, and 390 × 844 without horizontal overflow or React console warnings. Phase 12.3 — Dashboard
-V3 Implementation is the recommended next polish target and remains subject to explicit approval.
+1024, and 390 × 844 without horizontal overflow or React console warnings. These are historical
+Phase 12.2 results; Dashboard and the remaining Phase 12 polish subsequently completed as recorded below.
 
 Phase 12.2B is **complete**. The Chat route now expresses the V3 product identity more clearly
 without changing its layout or behavior: a slightly stronger localized atmospheric canvas gives

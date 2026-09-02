@@ -16,6 +16,16 @@ This folder stores decisions that materially affect the product or architecture.
 - [ADR-0010: Generate grounded answers with application-owned conversations](0010-rag-answer-generation.md)
 - [ADR-0011: Use revocable server-side sessions and verified email capability](0011-server-sessions-email-verification.md)
 
+## Evolution note (2026-08-26)
+
+Accepted ADRs preserve decision-time scope; their "not in this phase" statements are not the
+current feature inventory. Later work added bounded conversation context and titles (after
+ADR-0010), durable quotas and a local model-pricing/budget ledger (after ADR-0008/0010/0011),
+Worker Thread PDF containment (after ADR-0007), and the current Caddy/Railway deployment. ADR-0011
+records the active server-session/email architecture; historical JWT delivery notes are superseded.
+See [current architecture](../architecture.md), [security](../security.md), and the
+[technical reference](../technical-documentation.md). The original ADR texts remain unchanged.
+
 ## Naming
 
 Use sequential files:

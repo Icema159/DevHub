@@ -159,8 +159,10 @@ limiter state cannot be reached. Exceeded limits return `429 RATE_LIMITED` and `
 - verification resend: 3 per authenticated user and 5 per IP per 60 minutes;
 - verification submission: 20 per IP per 60 minutes.
 
-Identity values are SHA-256 hashed in Redis keys. Client IP uses Express `req.ip` with proxy trust
-disabled by default; production proxy trust must be configured later for the real topology.
+Identity values are SHA-256 hashed in Redis keys. Client IP uses Express `req.ip`. Development
+defaults to disabled proxy trust; production requires explicit `TRUSTED_PROXY_HOPS` from 0 to 2.
+The chosen value must be verified against the actual Caddy/Railway chain and forwarding-header
+spoof tests; configuration validation alone cannot establish trustworthy client IPs.
 
 ### Resource quotas and AI cost controls
 
@@ -175,6 +177,11 @@ per rolling 24 hours. Stable errors are `DOCUMENT_LIMIT_REACHED`, `STORAGE_LIMIT
 `PROCESSING_LIMIT_REACHED`, and `AI_DAILY_LIMIT_REACHED`. The global OpenAI hard stop returns `503
 AI_TEMPORARILY_UNAVAILABLE`; it never exposes spend, reservations, or pricing metadata and does not
 affect ordinary reads, authentication, logout, deletion, or cleanup.
+
+The deterministic empty-retrieval answer releases its AI-turn reservation. If retrieval found
+chunks but the invoked model returns the fixed insufficient-context answer, the normal response
+persistence path currently commits that turn. Either path may already incur query-embedding cost;
+user-turn accounting and provider-cost accounting are separate.
 
 ## Upload document
 
@@ -361,6 +368,11 @@ The owner-scoped update sets `deletedAt` before an identifier-only `document.del
 ```
 
 The request does not delete object storage, chunks, or embeddings synchronously. Soft deletion immediately removes the document from list/detail responses and semantic retrieval. Missing, foreign-owned, and already deleted identifiers all return `404 DOCUMENT_NOT_FOUND`.
+
+`202` confirms acceptance, not completed cleanup. An exhausted cleanup job can leave a hidden
+row and original object. The database's `(userId, fileHash)` uniqueness covers soft-deleted rows
+too, so that row can still cause `409 DUPLICATE_DOCUMENT` on an identical upload. Upload does not
+resurrect or reuse it; successful hard cleanup removes this particular uniqueness blocker.
 
 If cleanup queue submission fails, the API attempts to restore the exact soft-delete update and returns `503 DOCUMENT_DELETION_QUEUE_UNAVAILABLE`. Permanent cleanup deletes the private storage object first, then related chunk/vector data and the document row.
 
@@ -597,6 +609,49 @@ Relevant public errors include:
 Phase 11.7C renders validated source cards only from the persisted ASSISTANT messages returned by
 the authoritative detail reload. It does not synthesize citations from answer text or treat the
 POST response as canonical history. Source navigation opens the existing owner-scoped Document
-Details page; original-PDF viewing, download, and deep page anchors are not provided. Streaming,
-polling, WebSockets, Markdown, regeneration, editing, and attachments are not part of this
-contract.
+Details page; original-PDF viewing, download, and deep page anchors are not provided. This
+non-streaming endpoint does not itself support polling, WebSockets, Markdown, regeneration, editing,
+or attachments. Streaming is available through the separate endpoint documented next; the product's
+Threads UI calls that one, not this one.
+
+## Stream a conversation message (SSE)
+
+```http
+POST /api/conversations/:conversationId/messages/stream
+Content-Type: application/json
+
+{
+  "content": "Where should I store it?"
+}
+```
+
+Same authentication, ownership, CSRF, email-verification, and `content` validation as
+`POST /messages` above -- including the identical `404 CONVERSATION_NOT_FOUND` response for missing,
+foreign-owned, or soft-deleted conversations, and the same relevant public errors, all returned as a
+normal (non-SSE) JSON error response. That is deliberate: the connection is only switched into
+`text/event-stream` mode after the first event from the underlying turn has already been produced
+successfully, so every rejection above happens before any SSE framing exists.
+
+Once the first event is ready, the response is `200 OK` with `Content-Type: text/event-stream;
+charset=utf-8`, `Cache-Control: private, no-cache, no-store, must-revalidate`, and
+`Connection: keep-alive`. Each frame is `event: <type>\ndata: <json>\n\n`. A successful turn emits,
+in order:
+
+| Event | Payload | Meaning |
+| --- | --- | --- |
+| `user_message` | `{ type, message: { id, role, content, createdAt } }` | The persisted USER message, sent immediately so the client can render it without waiting on retrieval. |
+| `status` | `{ type, phase: "retrieving" }` | Retrieval has started. |
+| `status` | `{ type, phase: "generating" }` | Retrieval finished; generation has started. |
+| `delta` | `{ type, delta: string }` | One or more incremental chunks of answer text, in order. An insufficient-context turn (zero retrieved chunks) still emits exactly one `delta` carrying the fixed answer text, with no live provider call. |
+| `completed` | `{ type, result: { message, sources } }` | The persisted ASSISTANT message and source DTOs -- the same shape `POST /messages` returns in its `data` field. |
+
+If the browser disconnects before `completed`, the server aborts the in-flight turn; the AI-budget
+reservation is still settled (conservatively) rather than left open, matching the non-streaming
+endpoint's best-effort USER-message compensation on failure. If an unexpected failure happens after
+the first event was already written, one final `event: error` frame is sent
+(`{ code, message, status }`, matching the shape of the JSON errors listed above) before the
+connection closes; no raw error detail is ever included in that frame or logged.
+
+See docs/architecture.md's "Conversation streaming (SSE)" section for the full flow diagram and the
+heartbeat/idle-timeout analysis (no heartbeat is sent today; the current gaps between events are
+well inside Railway's SSE idle-close window).

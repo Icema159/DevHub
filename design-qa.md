@@ -1060,3 +1060,309 @@ Phase 12 — Product and Liquid Glass polish is complete and frozen. The impleme
 codified in `docs/design-manifesto.md`. No unresolved Phase 12 Critical or High visual/accessibility
 issue remains. The next approved project phase is Phase 13 — Security hardening and OWASP
 verification.
+
+---
+
+# UR-001A Chat-only Dark V4 Evaluation Design QA
+
+## Scope and comparison
+
+- Isolated development routes: `/experiments/chat-dark-v4` and
+  `/experiments/chat-dark-v4/:conversationId`.
+- Default `/chat` remained the production comparison surface and retained the light product
+  identity.
+- Source reference: `/Users/Aismantas/Downloads/knowledge-hub.html`.
+- Direct comparison evidence:
+  `output/ur-001a-chat-dark-v4/source-implementation-comparison.png`.
+- The implementation uses real authenticated conversation, message, and citation data. No fake
+  product state or new data contract was introduced.
+
+## Responsive and state matrix
+
+| Scenario | Result |
+| --- | --- |
+| 1440 × 900 | Passed; complete three-column workspace, readable answer and evidence surfaces, no horizontal overflow. |
+| 1280 × 800 | Passed; hierarchy and Composer remained usable without clipping. |
+| 1024 × 768 | Passed; dense desktop layout remained intact without horizontal overflow. |
+| 390 × 844 | Passed; selected thread and mobile controls remained operable without overflow. |
+| Mobile navigation | Passed; dark drawer, readable identity/navigation, visible close and logout controls. |
+| Empty workspace | Passed; truthful empty state with dark knowledge-workspace hierarchy. |
+| Loading | Passed; stable geometry and restrained dark skeleton treatment. |
+| Error | Passed; readable error copy and visible Retry action. |
+| Insufficient context | Passed; existing safe response rendered without invented source cards. |
+| Reduced motion | Passed; ambient animation computed to `none`. |
+| No backdrop filter | Passed; opaque dark fallback retained separation and readability. |
+
+## Findings and fixes
+
+1. The initial desktop capture exposed light source receipts, Composer input, and conversation-rail
+   header because existing utilities won over the experiment selectors. Route-scoped dark fills
+   corrected those surfaces without touching default Chat.
+2. The first mobile capture exposed a light top header and drawer close control. A route-scoped
+   mobile header/button correction restored the Dark V4 identity.
+3. The first error capture exposed a light Retry control. A route-scoped button foreground and
+   surface correction restored readable interaction contrast.
+
+All three corrections were re-captured in the affected states. No unrelated application change was
+needed.
+
+## Accessibility and runtime observations
+
+- Information surfaces prioritize opaque contrast over maximum glass transparency.
+- Existing semantic labels, keyboard behavior, focus-visible treatment, and reduced-motion path
+  were preserved.
+- Source evidence retains explicit text labels and is not communicated by color alone.
+- No page errors or application console errors were observed. One unrelated development-only
+  `/favicon.ico` 404 appeared at 1440 × 900.
+- Composer enablement was checked by typing and clearing a draft; no message was submitted and no
+  provider cost or persistent QA data was created.
+
+## Isolation and dependency verification
+
+- The Dark V4 identity is route-scoped and the experiment path is absent from the production
+  JavaScript bundle.
+- Playwright ran once from the npm cache for QA only. It was not added to project dependencies.
+- `package.json`, `apps/web/package.json`, and `package-lock.json` were not modified by this
+  experiment.
+- No backend, API, RAG, Worker, Prisma, authentication, or database contract changed.
+
+## Final result
+
+final result: passed
+
+# UR-001A Dark V4.4 — Thread terminology and composer cleanup
+
+## Scope
+
+- Source references: `/var/folders/64/85sc13g154140gf2tl268xdr0000gp/T/codex-clipboard-6c0453c9-cb82-44f9-a45e-64b69865d89b.png` and `/var/folders/64/85sc13g154140gf2tl268xdr0000gp/T/codex-clipboard-5b19ec11-eeeb-462f-8aa1-e0b8edc542cf.png`.
+- Target: `/experiments/chat-dark-v4` only.
+- Requested changes: visible Chat/Conversation copy now uses Thread/Threads, the redundant rail heading/subtitle is removed, the one-page count footer is removed, and the idle helper line below the compact composer is removed.
+
+## Automated evidence
+
+- Focused conversation, composer, and app-navigation tests: 46/46 passed.
+- Full web suite: 320/320 passed.
+- TypeScript, ESLint, Prettier, production build, and `git diff --check`: passed.
+- The existing `/chat` route retains its original Chat/Conversation copy and helper behavior; internal Conversation API/model contracts were not changed.
+
+## Browser QA status
+
+The in-app browser tab was available, but the browser security review rejected local-page access because the current Codex usage limit was reached. Therefore no new screenshot or live console observation is claimed for this incremental change. Automated tests cover the visible terminology, route scoping, footer condition, and idle composer helper removal.
+
+## Findings
+
+- P0/P1: none found in automated verification.
+- Browser-only checks (1440 px, 390 px, live console): blocked by the browser usage limit and remain to be rerun when access is available.
+
+## Final result
+
+final result: blocked
+
+---
+
+# UR-001A Dark V4 Composer Reference Replacement
+
+## Evidence and normalization
+
+- Source visual truth:
+  `/var/folders/64/85sc13g154140gf2tl268xdr0000gp/T/codex-clipboard-5d968111-79b1-4911-bcce-48a3108e91d6.png`
+  at 2551 × 1306 pixels.
+- Final desktop implementation:
+  `output/ur-001a-chat-dark-v4/composer-replacement-1440.png` at a 1440 × 900 CSS viewport and
+  1440 × 900 pixels.
+- Final mobile sanity implementation:
+  `output/ur-001a-chat-dark-v4/composer-replacement-390.png` at a 390 × 844 CSS viewport and
+  390 × 844 pixels.
+- State: authenticated selected conversation with a long answer, scrollable message region, idle
+  Composer, empty draft, and disabled Send control.
+
+The source and implementation use different viewport widths and real conversation content. They
+were compared together in one visual input, with the Composer geometry and material treated as the
+normalized target. A separate raster crop was not necessary because the pill, Send control, helper
+line, dock, and surrounding Chat surface remain clearly readable in both full-view captures.
+
+## Full-view and focused Composer comparison
+
+- The old nested rectangular Composer material was replaced in the `compact` experiment branch by
+  one 50 px-high translucent pill at 1440 px and one 46 px-high pill at 390 px.
+- The pill contains exactly the `TEXTAREA` and `BUTTON`. The helper is a separate row below the pill
+  and does not inherit the glass fill.
+- At 1440 px, the pill and helper text both start at x=611. The pill ends at x=1392 and the circular
+  Send control ends at x=1380, leaving a 12 px right inset.
+- At 390 px, the pill and helper text both start at x=40. The Send control retains an 11 px right
+  inset and the 12 px placeholder remains on one line.
+- The final pill uses a restrained grey-purple translucent fill, 20 px backdrop blur, a soft
+  top-edge highlight, a low-contrast border, and no additional aurora or glow element.
+
+## Comparison history
+
+1. The initial implementation pass left helper copy inside the nested input surface. The compact
+   branch was separated so the pill contains only the input and Send control.
+2. Browser keyboard QA exposed that focusing and expanding the textarea could scroll the
+   `overflow-hidden` workspace shell itself, temporarily displacing the persistent Composer. The
+   route-scoped shell was changed to `overflow: clip`; after Shift+Enter the shell remained at
+   `scrollTop=0`, while the message region retained `overflow-y: auto`.
+3. Human review requested a narrower pill aligned with the helper text and more right padding around
+   Send. The final horizontal insets were recalibrated and re-captured at both viewports.
+4. The first narrowed mobile capture wrapped the placeholder. A 12 px mobile-only input size kept
+   the approved compact geometry while restoring a single-line placeholder.
+
+## Required fidelity surfaces
+
+- Fonts and typography: existing Inter typography is preserved; only the mobile compact input uses
+  a route-scoped 12 px size to prevent placeholder wrapping.
+- Spacing and layout rhythm: no Chat, rail, Sidebar, answer, source, or workspace geometry changed.
+  Composer-only pill margins, inner padding, helper gap, and Send inset were calibrated.
+- Colors and tokens: the established Dark V4 blue Send action and grey-purple glass language are
+  preserved. No accent palette or aurora change was introduced.
+- Image and asset fidelity: no visible asset, icon library, logo, or illustration changed; the
+  existing Lucide Send icon remains centered in the circular control.
+- Copy and content: the compact helper uses the approved copy. Real conversation, answer, citation,
+  and source content remain server-authoritative and unchanged.
+
+## Runtime, interaction, and accessibility observations
+
+- 1440 × 900: passed. Composer is visible at the bottom, pill and helper alignment is exact, long
+  content scrolls internally, and there is no horizontal overflow.
+- 390 × 844: passed. Composer, one-line placeholder, helper, and circular Send remain visible with
+  no horizontal overflow.
+- Browser typing and Shift+Enter passed (`First line\nSecond line`), and the Composer remained
+  persistent. The draft was cleared without submitting a message.
+- Enter submission, Send click, validation, disabled, loading, and IME behavior passed in the
+  automated Composer regression suite. No live message was submitted, avoiding provider cost and
+  persistent QA data.
+- Browser console errors: none. Browser console warnings: none.
+
+## Findings
+
+- P0 blockers: none.
+- P1 major issues: none.
+- P2 issues found during this iteration: helper placement, focus-induced shell scrolling, human-
+  requested horizontal alignment, and mobile placeholder wrapping. All were fixed and reverified.
+- P3 follow-up: none recorded because the task stops after this Composer replacement.
+
+## Final result
+
+final result: passed
+
+The experiment is technically and visually ready for direct human comparison. This result does not
+authorize a product-wide Dark V4 rollout.
+
+---
+
+# UR-001A Dark V4.1 Revision — current implementation review
+
+The Human Decision Amendment in `docs/ui-redesign/tasks/UR-001-liquid-glass-foundation/decision.md`
+supersedes the original citation-linking exclusion for this isolated experiment only. The current
+implementation is a route-scoped V4.1 revision; the default light `/chat` route and all backend
+contracts remain unchanged.
+
+## Confirmed in the current revision
+
+- one centered floating workspace contains the conversation rail and Chat pane with an internal
+  divider;
+- the Sidebar is inset and compact, with stronger product identity and a denser selected state;
+- the canvas exposes the existing three ambient fields without adding animation or field count;
+- assistant answers remain near-opaque and readable, while source receipts are lightweight rows;
+- cyan is reserved for evidence labels and states; primary actions and user messages remain blue;
+- citation markers use controlled React elements and message-local known-label matching only;
+- unknown/malformed markers remain inert text; hover, focus, click, keyboard, touch, and reduced-motion
+  behavior target only the matching receipt in the same message;
+- no Markdown, HTML interpretation, `innerHTML`, or `dangerouslySetInnerHTML` was introduced.
+
+## Current evidence and gate
+
+The calibrated 1440 × 900 real-data capture is stored at
+`output/ur-001a-chat-dark-v4/dark-v4-1-1440x900.png` and was compared directly with the supplied
+Claude reference. The remaining 1280 × 800, 1024 × 768, 390 × 844, reduced-motion, no-backdrop,
+loading, empty, error, insufficient-context, and citation-edge browser checks still require a fresh
+browser pass; the connected browser reached its account usage limit during this continuation. The
+automated frontend suite is green: 317 tests, TypeScript, ESLint, Prettier, and production build.
+
+## Human decision
+
+`READY_FOR_HUMAN_REVIEW` — this record does not self-approve the visual direction or authorize a
+product-wide Dark V4 rollout.
+
+---
+
+# UR-001A Dark V4.4 Material / Surface Hierarchy Calibration
+
+## Evidence and normalization
+
+- Source visual truth:
+  `/var/folders/64/85sc13g154140gf2tl268xdr0000gp/T/codex-clipboard-5d968111-79b1-4911-bcce-48a3108e91d6.png`
+  at 2551 × 1306 pixels.
+- Captured V4.3 baseline:
+  `output/ur-001a-chat-dark-v4/v4-3-before-1440.png` at 1440 × 900 pixels.
+- Final implementation capture:
+  `output/ur-001a-chat-dark-v4/v4-4-1440.png` at a 1440 × 900 CSS viewport and 1440 × 900 pixels.
+- Mobile sanity capture: `output/ur-001a-chat-dark-v4/v4-4-390.png` at a 390 × 844 CSS viewport and
+  390 × 844 pixels.
+- State: authenticated selected conversation with a long assistant answer, inline citations,
+  source receipts, internal message scrolling, and the persistent Composer visible.
+
+The source uses a wider crop and different authenticated content, so the comparison was normalized
+by evaluating the same material regions rather than treating text wrapping or message length as a
+pixel-perfect target. Reference, baseline, and V4.4 captures were opened together in one comparison
+input. A separate focused crop was not required because the full 1440 × 900 capture keeps the outer
+shell, Chat canvas, assistant surface, citations, sources, and Composer readable at once.
+
+## Full-view material comparison
+
+| Surface | V4.3 baseline | V4.4 result |
+| --- | --- | --- |
+| Canvas | Existing blue/cyan/violet aurora | Preserved without new fields, geometry, or animation |
+| Floating shell | Mid-grey material merged with Chat | Dark translucent `rgba(9, 14, 24, 0.58)` glass with restrained blue/violet transmission |
+| Chat canvas | Transparent over the outer shell | Calmer, greyer `rgba(42, 44, 51, 0.90)` internal conversation plane |
+| Assistant answer | Near-opaque `rgba(63, 65, 73, 0.985)` | Lighter near-opaque `rgba(72, 74, 81, 0.985)` knowledge surface |
+| Composer | Extended below the shell at 1440 px and was visually heavy | Fully contained, visibly persistent, lower-alpha glass chrome with unchanged message behavior |
+
+The final computed order is visibly and numerically distinct: near-opaque assistant answer → 90%
+grey Chat canvas → 58% dark floating glass → aurora environment. The existing primary CTA remained
+the `#3b9bff`/`#0a84ff` gradient and evidence remained `#64dfff`.
+
+## Comparison history
+
+1. Baseline QA found the workspace composition at 756 px high while the inner Chat shell was 820 px
+   high. The Composer began at y=810 and extended beyond the 900 px viewport.
+2. The route-scoped desktop child height was constrained to 100% of the accepted workspace shell.
+   The final Composer ends at y=849.7 inside the composition ending at y=851.7.
+3. The first 390 × 844 check found the inherited shell height ending at y=887.6. A narrow mobile-only
+   height correction retained the existing responsive structure while moving the full Composer
+   inside the useful viewport; it now ends at y=826.6.
+4. The final 1440 × 900 and 390 × 844 captures were repeated. The long message region reports
+   `overflow-y: auto`, the Composer remains a non-shrinking sibling, and neither viewport has page-
+   level horizontal overflow.
+
+## Required fidelity surfaces
+
+- Fonts and typography: unchanged Inter family, hierarchy, wrapping, labels, and source copy.
+- Spacing and layout rhythm: accepted centered composition, rail width, answer measure, CTA, source
+  receipt layout, and Sidebar geometry are unchanged. Only the erroneous child-height containment
+  and mobile viewport fit were corrected.
+- Colors and tokens: blue CTA, blue user state, cyan evidence, and existing aurora family are
+  unchanged. New route-local tokens affect only the three major Dark V4 material levels.
+- Image and asset fidelity: no image, icon, logo, or illustration asset changed.
+- Copy and content: no product copy, backend data, message, citation, or source contract changed.
+
+## Runtime and accessibility observations
+
+- 1440 × 900: passed. The three material levels are visible in a static capture, the Composer is
+  fully visible, the messages region scrolls internally, and the browser console has no errors.
+- 390 × 844: passed. The selected thread, source rows, Composer input, helper text, and circular Send
+  control remain visible with no horizontal overflow; internal message scrolling remains active.
+- Existing semantic labels, citation controls, focus behavior, Enter/Shift+Enter behavior,
+  validation, disabled/loading states, and message submission logic were not modified.
+
+## Findings
+
+- P0 blockers: none.
+- P1 major issues: none.
+- P2 acceptance issues: the desktop and mobile Composer containment defects were found, fixed, and
+  reverified.
+- P3 follow-up: none recorded because this ticket explicitly stops after the V4.4 calibration.
+
+## Final result
+
+final result: passed
