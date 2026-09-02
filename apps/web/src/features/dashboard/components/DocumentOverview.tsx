@@ -79,11 +79,12 @@ export function DocumentOverview({ onRetry, resource }: DocumentOverviewProps) {
           {overviewItems.map(({ description, icon: Icon, key, label, tone }) => (
             <Card
               key={key}
-              className="flex min-w-0 flex-col items-start gap-3 bg-white/95 p-4 sm:min-h-28 sm:flex-row sm:items-center sm:gap-4"
+              className="overview-stat-card flex min-w-0 flex-col items-start gap-3 p-4 sm:min-h-28 sm:flex-row sm:items-center sm:gap-4"
+              data-stat={key}
               variant="solid"
             >
               <span
-                className={`flex size-11 shrink-0 items-center justify-center rounded-card ${tone}`}
+                className={`overview-stat-icon flex size-10 shrink-0 items-center justify-center rounded-card ${tone}`}
               >
                 <Icon className="size-5" aria-hidden="true" />
               </span>

@@ -232,6 +232,44 @@ describe('ConversationThread', () => {
     expect(screen.queryByRole('article')).not.toBeInTheDocument();
   });
 
+  it('shows a transient turn immediately and keeps streamed citation markers inert', () => {
+    render(
+      <MemoryRouter>
+        <ConversationThread
+          enableCitationInteraction
+          isSubmitting
+          messages={[]}
+          pendingContent="How does auth work?"
+          streamedAnswer="It uses a cookie [S1]"
+          streamingPhase="generating"
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId('pending-user-message')).toHaveTextContent('How does auth work?');
+    expect(screen.getByTestId('streaming-assistant-message')).toHaveTextContent(
+      'It uses a cookie [S1]',
+    );
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /source/i })).not.toBeInTheDocument();
+  });
+
+  it('shows retrieval feedback before the first model delta', () => {
+    render(
+      <MemoryRouter>
+        <ConversationThread
+          isSubmitting
+          messages={[]}
+          pendingContent="Question"
+          streamedAnswer=""
+          streamingPhase="retrieving"
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('status')).toHaveTextContent('Retrieving relevant sources…');
+  });
+
   it('renders deterministic insufficient context as a normal ASSISTANT message', () => {
     renderThread([
       {

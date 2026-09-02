@@ -1,13 +1,14 @@
-import { Network } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { cn } from '../../lib/cn';
+import { DkhMark } from './DkhMark';
 
 export interface BrandProps {
   className?: string;
+  subtitle?: string;
 }
 
-export function Brand({ className }: BrandProps) {
+export function Brand({ className, subtitle }: BrandProps) {
   return (
     <Link
       to="/dashboard"
@@ -17,11 +18,18 @@ export function Brand({ className }: BrandProps) {
       )}
       aria-label="Developer Knowledge Hub dashboard"
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-card bg-gradient-to-br from-primary to-primary-active text-on-primary shadow-glass-low">
-        <Network className="size-5" strokeWidth={2} aria-hidden="true" />
+      <span className="flex size-9 shrink-0 items-center justify-center">
+        <DkhMark className="size-8" />
       </span>
-      <span className="whitespace-nowrap type-body font-semibold leading-5 tracking-tight">
-        Developer Knowledge Hub
+      <span className="min-w-0">
+        <span className="block whitespace-nowrap type-body font-semibold leading-5 tracking-tight">
+          Developer Knowledge Hub
+        </span>
+        {subtitle ? (
+          <span className="chat-dark-v4-brand-caption mt-0.5 block type-caption font-medium text-muted">
+            {subtitle}
+          </span>
+        ) : null}
       </span>
     </Link>
   );

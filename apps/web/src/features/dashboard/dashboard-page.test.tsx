@@ -139,11 +139,12 @@ beforeEach(() => {
   mockDashboardData();
 });
 
-describe('Dashboard page', () => {
+describe('Overview page', () => {
   it('renders personalized real counts, documents, conversations, and attention data', () => {
     renderDashboard();
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Welcome back, Marius');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Overview');
+    expect(screen.getByText(/Welcome back, Marius/)).toBeInTheDocument();
     expect(screen.getByText('Documents').previousElementSibling).toHaveTextContent('4');
     expect(screen.getByText('Authentication Guide.pdf')).toBeInTheDocument();
     expect(screen.getByText('JWT Authentication')).toBeInTheDocument();
@@ -169,8 +170,9 @@ describe('Dashboard page', () => {
 
     renderDashboard();
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Welcome back');
-    expect(screen.getByRole('heading', { level: 1 })).not.toHaveTextContent(',');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Overview');
+    expect(screen.getByText(/Welcome back\./)).toBeInTheDocument();
+    expect(screen.queryByText(/Welcome back,/)).not.toBeInTheDocument();
   });
 
   it('renders stable new-user onboarding and empty states', () => {
@@ -198,7 +200,7 @@ describe('Dashboard page', () => {
 
     expect(screen.getByText('Build your knowledge base')).toBeInTheDocument();
     expect(screen.getByText('No documents yet')).toBeInTheDocument();
-    expect(screen.getByText('No conversations yet')).toBeInTheDocument();
+    expect(screen.getByText('No threads yet')).toBeInTheDocument();
     expect(screen.getByText('All documents are on track')).toBeInTheDocument();
   });
 
@@ -260,15 +262,15 @@ describe('Dashboard page', () => {
     expect(screen.getByRole('heading', { name: 'Documents destination' })).toBeInTheDocument();
   });
 
-  it('navigates from New chat to chat without creating a conversation', async () => {
+  it('navigates from New thread to chat without creating a conversation', async () => {
     const user = userEvent.setup();
     renderDashboard();
 
-    await user.click(screen.getByRole('link', { name: /New chat/ }));
+    await user.click(screen.getByRole('link', { name: /New thread/ }));
     expect(screen.getByRole('heading', { name: 'Chat destination' })).toBeInTheDocument();
   });
 
-  it('does not render unsupported Dashboard concepts', () => {
+  it('does not render unsupported Overview concepts', () => {
     renderDashboard();
 
     expect(screen.queryByText(/Activity/i)).not.toBeInTheDocument();

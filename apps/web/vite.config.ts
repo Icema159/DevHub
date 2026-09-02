@@ -15,6 +15,12 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       allowedHosts: ['terminal.local'],
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+        },
+      },
     },
     preview: {
       headers: createWebSecurityHeaders(apiBaseUrl, mode === 'production'),

@@ -17,7 +17,7 @@ export function DashboardActionLink({
 }: DashboardActionLinkProps) {
   return (
     <Link
-      className="material-interaction dashboard-action focus-material group flex min-h-28 min-w-0 items-center gap-4 overflow-hidden rounded-glass border p-5 transition duration-200 hover:border-primary/25 active:translate-y-px motion-reduce:transform-none"
+      className="material-interaction overview-action overview-v4-action focus-material group flex min-h-24 min-w-0 items-center gap-4 overflow-hidden rounded-glass border p-4 transition duration-200 hover:border-primary/25 active:translate-y-px motion-reduce:transform-none sm:p-5"
       to={to}
     >
       <span className="flex size-11 shrink-0 items-center justify-center rounded-card bg-gradient-to-br from-primary to-indigo-700 text-white shadow-glass-low">

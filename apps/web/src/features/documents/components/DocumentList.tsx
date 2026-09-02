@@ -27,32 +27,32 @@ export function DocumentList({
   if (resource.status === 'loading') {
     return (
       <section
-        className="material-knowledge documents-library-surface elevation-0 overflow-hidden rounded-card border"
+        className="material-knowledge documents-library-surface overflow-hidden rounded-none border-0"
         aria-label="Loading documents"
         role="status"
       >
         <span className="sr-only">Loading documents</span>
-        <div className="hidden grid-cols-[2.5rem_minmax(14rem,1fr)_9rem_7rem_10rem] gap-3 border-b border-border bg-slate-50/72 px-5 py-3 type-small font-semibold text-secondary xl:grid">
-          <span aria-hidden="true" />
+        <div className="documents-v4-table-header hidden grid-cols-[3.5rem_minmax(14rem,1fr)_7rem_10rem_7rem] gap-3 border-b border-border px-5 py-3 type-caption font-semibold uppercase tracking-[0.08em] text-muted xl:grid">
+          <span aria-hidden="true">№</span>
           <span>Document</span>
-          <span>Status</span>
           <span>Size</span>
           <span>Uploaded</span>
+          <span>Status</span>
         </div>
         <div className="divide-y divide-border/75 px-4 sm:px-5">
           {Array.from({ length: 6 }, (_, index) => (
             <div
               key={index}
-              className="grid min-h-18 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-3 py-3.5 sm:grid-cols-[2.5rem_minmax(0,1fr)_7rem] xl:grid-cols-[2.5rem_minmax(14rem,1fr)_9rem_7rem_10rem]"
+              className="grid min-h-16 grid-cols-[2.5rem_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[2.5rem_minmax(0,1fr)_7rem] xl:grid-cols-[3.5rem_minmax(14rem,1fr)_7rem_10rem_7rem]"
             >
               <Skeleton className="size-10 rounded-control" />
               <div className="min-w-0">
                 <Skeleton className="h-4 max-w-sm" />
                 <Skeleton className="mt-2 h-3 max-w-36 xl:hidden" />
               </div>
-              <Skeleton className="hidden h-7 w-24 rounded-full sm:block" />
               <Skeleton className="hidden h-4 w-16 xl:block" />
               <Skeleton className="hidden h-4 w-24 xl:block" />
+              <Skeleton className="hidden h-7 w-20 rounded-full sm:block" />
             </div>
           ))}
         </div>
@@ -67,7 +67,7 @@ export function DocumentList({
   if (resource.status === 'error') {
     return (
       <section
-        className="material-knowledge documents-library-surface elevation-0 overflow-hidden rounded-card border p-4 sm:p-6"
+        className="material-knowledge documents-library-surface overflow-hidden rounded-none border-0 p-4 sm:p-6"
         aria-labelledby="document-list-error-heading"
       >
         <h2 id="document-list-error-heading" className="sr-only">
@@ -87,7 +87,7 @@ export function DocumentList({
   if (resource.data.documents.length === 0) {
     return (
       <section
-        className="material-knowledge documents-library-surface elevation-0 overflow-hidden rounded-card border"
+        className="material-knowledge documents-library-surface overflow-hidden rounded-none border-0"
         aria-labelledby="document-list-empty-heading"
       >
         <h2 id="document-list-empty-heading" className="sr-only">
@@ -108,24 +108,28 @@ export function DocumentList({
 
   return (
     <section
-      className="material-knowledge documents-library-surface elevation-0 overflow-hidden rounded-card border"
+      className="material-knowledge documents-library-surface overflow-hidden rounded-none border-0"
       aria-labelledby="document-list-heading"
     >
       <h2 id="document-list-heading" className="sr-only">
         Documents
       </h2>
 
-      <div className="hidden grid-cols-[2.5rem_minmax(14rem,1fr)_9rem_7rem_10rem] gap-3 border-b border-border bg-slate-50/72 px-5 py-3 type-small font-semibold text-secondary xl:grid">
-        <span aria-hidden="true" />
+      <div className="documents-v4-table-header hidden grid-cols-[3.5rem_minmax(14rem,1fr)_7rem_10rem_7rem] gap-3 border-b border-border px-5 py-3 type-caption font-semibold uppercase tracking-[0.08em] text-muted xl:grid">
+        <span aria-hidden="true">№</span>
         <span>Document</span>
-        <span>Status</span>
         <span>Size</span>
         <span>Uploaded</span>
+        <span>Status</span>
       </div>
 
       <ul>
-        {resource.data.documents.map((document) => (
-          <DocumentListItem key={document.id} document={document} />
+        {resource.data.documents.map((document, index) => (
+          <DocumentListItem
+            key={document.id}
+            document={document}
+            ordinal={(resource.data.meta.page - 1) * resource.data.meta.limit + index + 1}
+          />
         ))}
       </ul>
 

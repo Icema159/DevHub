@@ -28,7 +28,7 @@ export function DocumentDetailsHeader({
     <header className="material-interaction document-details-identity elevation-1 rounded-glass border p-5 sm:p-6">
       <div className="flex min-w-0 flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-4 sm:gap-5">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-card border border-danger/10 bg-danger-soft/65 text-danger sm:size-16">
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-card border border-primary/10 bg-primary-soft/65 text-primary sm:size-16">
             <FileText className="size-7 sm:size-8" aria-hidden="true" />
           </span>
 
@@ -61,7 +61,7 @@ export function DocumentDetailsHeader({
         </div>
 
         <Button
-          className="w-full shrink-0 sm:w-auto"
+          className="document-details-refresh w-full shrink-0 sm:w-auto"
           disabled={refreshDisabled}
           isLoading={isRefreshing}
           loadingLabel="Refreshing…"

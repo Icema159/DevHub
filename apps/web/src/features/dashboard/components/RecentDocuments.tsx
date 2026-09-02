@@ -34,7 +34,7 @@ export function RecentDocuments({ onRetry, resource }: RecentDocumentsProps) {
 
       {resource.status === 'success' && resource.data.documents.length === 0 ? (
         <EmptyState
-          className="py-8"
+          className="overview-v4-empty-state py-8"
           description="Your recently uploaded documents will appear here."
           icon={<Files className="size-6" aria-hidden="true" />}
           title="No documents yet"
@@ -42,13 +42,13 @@ export function RecentDocuments({ onRetry, resource }: RecentDocumentsProps) {
       ) : null}
 
       {resource.status === 'success' && resource.data.documents.length > 0 ? (
-        <ul className="divide-y divide-border/80">
+        <ul className="overview-v4-rows divide-y divide-border/80">
           {resource.data.documents.map((document) => (
             <li
               key={document.id}
-              className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
+              className="overview-v4-row grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-3 px-2 py-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-danger-soft/65 text-danger">
+              <span className="overview-document-icon flex size-9 shrink-0 items-center justify-center rounded-control bg-info-soft text-info">
                 <FileText className="size-5" aria-hidden="true" />
               </span>
               <span className="min-w-0">

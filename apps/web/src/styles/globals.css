@@ -223,6 +223,40 @@
   }
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * KNOWN TECHNICAL DEBT: layered "-identity" visual generations (documented,
+ * not consolidated, by the release-engineering pass that added this note).
+ *
+ * This file carries rules scoped to at least three generations of
+ * page-identity classes, applied to `.app-canvas` and read by descendant
+ * selectors:
+ *   - earliest / light:        `.living-glass-identity`
+ *   - V2/V3 light, per-page:   `.chat-identity`, `.overview-identity`,
+ *                              `.documents-identity`,
+ *                              `.document-details-identity`
+ *   - V4 dark, per-page:       `.chat-dark-v4-identity`, `.overview-v4-identity`,
+ *                              `.documents-v4-identity`, `.auth-v4-identity`
+ *
+ * V4 dark is the shipped, current production identity across every
+ * authenticated page and Auth. The earlier light-era classes were not
+ * deleted: removing them (or any rule under them) requires confirming, for
+ * every current route, that nothing still resolves to that selector and that
+ * no shared component still receives that class name -- that is a real
+ * regression-testing exercise, not a safe mechanical cleanup, and it was not
+ * attempted here. Do not delete or "clean up" light-era rules without that
+ * verification.
+ *
+ * `chat-dark-v4-identity` is named after Chat specifically even though it is
+ * applied by more than just the Chat/Threads page (see the shared
+ * `.chat-dark-v4-identity, .overview-v4-identity` selector groups below) --
+ * a rename to something identity-generic was considered and deliberately
+ * deferred rather than done as part of this pass, since it touches a widely
+ * applied class name with no functional upside and real regression risk for
+ * a purely cosmetic rename. Revisit only as a dedicated, reviewed task.
+ * ---------------------------------------------------------------------------
+ */
+
 @layer components {
   .app-canvas {
     background-color: var(--color-background);
@@ -558,7 +592,7 @@
     opacity: 0.52;
   }
 
-  .dashboard-identity .dashboard-action {
+  .overview-identity .overview-action {
     border-color: rgba(148, 163, 184, 0.2);
     background: rgba(255, 255, 255, 0.9);
     box-shadow:
@@ -567,7 +601,7 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.88);
   }
 
-  .dashboard-identity .dashboard-action::after {
+  .overview-identity .overview-action::after {
     background:
       radial-gradient(circle at -3% 18%, rgba(125, 211, 252, 0.25) 0 7%, transparent 25%),
       radial-gradient(circle at 102% 82%, rgba(167, 139, 250, 0.22) 0 7%, transparent 25%);
@@ -623,26 +657,26 @@
     min-height: 2.75rem;
   }
 
-  .dashboard-sections-grid {
+  .overview-sections-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
   @media (min-width: 1280px) {
-    .dashboard-sections-grid {
+    .overview-sections-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .dashboard-attention-section {
+    .overview-attention-section {
       grid-column: span 2 / span 2;
     }
   }
 
   @media (min-width: 1360px) {
-    .dashboard-sections-grid {
+    .overview-sections-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    .dashboard-attention-section {
+    .overview-attention-section {
       grid-column: span 1 / span 1;
     }
   }
@@ -709,6 +743,544 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
+
+  /* Threads V4 production surface, shared with the approved Overview environment. */
+  .app-canvas.chat-dark-v4-identity,
+  .app-canvas.overview-v4-identity {
+    --color-background: #0c1422;
+    --color-foreground: #f7f9ff;
+    --color-secondary: #d1d8e8;
+    --color-muted: #aeb9cf;
+    --color-subtle: #8794ad;
+    --color-primary: #3b9bff;
+    --color-primary-hover: #5aaaff;
+    --color-primary-active: #0a84ff;
+    --color-primary-soft: rgba(59, 155, 255, 0.16);
+    --color-on-primary: #ffffff;
+    --color-evidence: #64dfff;
+    --color-evidence-soft: rgba(100, 223, 255, 0.13);
+    --color-surface: #202632;
+    --color-surface-elevated: #262d39;
+    --color-glass-border: rgba(226, 236, 255, 0.2);
+    --color-glass-border-neutral: rgba(196, 211, 238, 0.19);
+    --color-focus-ring: #4aa3ff;
+    --color-border: rgba(196, 211, 238, 0.16);
+    --color-border-strong: rgba(218, 228, 246, 0.3);
+    --shadow-elevation-0: 0 1px 2px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    --shadow-elevation-1:
+      0 20px 52px rgba(0, 0, 0, 0.34), 0 3px 10px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    --shadow-elevation-2:
+      0 28px 72px rgba(0, 0, 0, 0.42), 0 8px 26px rgba(0, 0, 0, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    color-scheme: dark;
+    background-color: var(--color-background);
+    background-image:
+      radial-gradient(ellipse 70% 82% at -9% -10%, rgba(59, 126, 255, 0.42), transparent 67%),
+      radial-gradient(ellipse 56% 72% at 103% 2%, rgba(76, 214, 255, 0.22), transparent 69%),
+      radial-gradient(ellipse 58% 54% at 88% 108%, rgba(255, 78, 124, 0.2), transparent 72%),
+      radial-gradient(ellipse 56% 54% at 20% 105%, rgba(191, 90, 242, 0.28), transparent 72%),
+      linear-gradient(148deg, #14213a 0%, #0b1221 45%, #121321 100%);
+  }
+
+  .chat-dark-v4-identity .ambient-light-field--blue,
+  .overview-v4-identity .ambient-light-field--blue {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(24, 133, 255, 0.48) 0%,
+      rgba(59, 155, 255, 0.2) 42%,
+      transparent 74%
+    );
+    opacity: 0.84;
+  }
+
+  .chat-dark-v4-identity .ambient-light-field--violet,
+  .overview-v4-identity .ambient-light-field--violet {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(191, 90, 242, 0.33) 0%,
+      rgba(124, 92, 246, 0.15) 42%,
+      transparent 75%
+    );
+    opacity: 0.72;
+  }
+
+  .chat-dark-v4-identity .ambient-light-field--lower,
+  .overview-v4-identity .ambient-light-field--lower {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 65, 109, 0.27) 0%,
+      rgba(100, 210, 255, 0.1) 43%,
+      transparent 76%
+    );
+    opacity: 0.68;
+  }
+
+  .chat-dark-v4-identity .focus-material:focus-visible,
+  .overview-v4-identity .focus-material:focus-visible {
+    box-shadow: 0 0 0 1px rgba(4, 8, 18, 0.96);
+  }
+
+  .chat-dark-v4-identity :where(.material-navigation, .material-workspace, .material-interaction),
+  .overview-v4-identity :where(.material-navigation, .material-workspace, .material-interaction) {
+    border-color: rgba(184, 202, 230, 0.16);
+  }
+
+  .chat-dark-v4-identity
+    :where(.material-navigation, .material-workspace, .material-interaction)::before,
+  .overview-v4-identity
+    :where(.material-navigation, .material-workspace, .material-interaction)::before {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 1px 0 0 rgba(255, 255, 255, 0.055),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+  }
+
+  .chat-dark-v4-identity
+    :where(.material-navigation, .material-workspace, .material-interaction)::after,
+  .overview-v4-identity
+    :where(.material-navigation, .material-workspace, .material-interaction)::after {
+    background:
+      radial-gradient(circle at 7% -8%, rgba(255, 255, 255, 0.32) 0 10%, transparent 28%),
+      radial-gradient(circle at 103% 48%, rgba(100, 210, 255, 0.2) 0 7%, transparent 23%),
+      radial-gradient(circle at 72% 104%, rgba(191, 90, 242, 0.14) 0 6%, transparent 22%);
+    opacity: 0.64;
+  }
+
+  .chat-dark-v4-identity .material-navigation {
+    border-color: rgba(226, 236, 255, 0.24);
+    background: rgba(29, 34, 44, 0.95);
+    box-shadow:
+      0 26px 68px rgba(0, 0, 0, 0.38),
+      0 4px 14px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.17);
+  }
+
+  .chat-dark-v4-identity .material-navigation::before {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 1px 0 0 rgba(100, 210, 255, 0.075),
+      inset -1px 0 0 rgba(191, 90, 242, 0.045),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.34);
+  }
+
+  .chat-dark-v4-identity > header.material-workspace {
+    border-color: rgba(184, 202, 230, 0.16);
+    background: rgba(9, 15, 30, 0.96) !important;
+    box-shadow:
+      0 10px 28px rgba(0, 0, 0, 0.3),
+      inset 0 -1px 0 rgba(100, 210, 255, 0.08);
+  }
+
+  .chat-dark-v4-identity > header button {
+    border-color: rgba(184, 202, 230, 0.2);
+    color: var(--color-secondary);
+    background: rgba(16, 24, 42, 0.94) !important;
+  }
+
+  .chat-dark-v4-identity .chat-conversation-rail,
+  .chat-dark-v4-identity .chat-workspace-shell {
+    border-color: rgba(216, 228, 248, 0.18);
+    background: rgba(31, 35, 43, 0.94);
+    box-shadow:
+      0 24px 64px rgba(0, 0, 0, 0.34),
+      0 3px 12px rgba(0, 0, 0, 0.19),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .chat-dark-v4-identity .chat-conversation-rail::after {
+    background:
+      radial-gradient(circle at -3% 21%, rgba(100, 210, 255, 0.19) 0 7%, transparent 25%),
+      radial-gradient(circle at 102% 4%, rgba(191, 90, 242, 0.14) 0 6%, transparent 22%);
+    opacity: 0.72;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell::after {
+    background:
+      radial-gradient(circle at 101% 10%, rgba(100, 210, 255, 0.17) 0 6%, transparent 23%),
+      radial-gradient(circle at 16% 103%, rgba(191, 90, 242, 0.13) 0 6%, transparent 24%);
+    opacity: 0.68;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-header,
+  .chat-dark-v4-identity .chat-conversation-rail > :first-child,
+  .chat-dark-v4-identity .chat-conversation-rail > :last-child {
+    border-color: rgba(184, 202, 230, 0.13);
+    background: rgba(39, 42, 50, 0.94) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(100, 210, 255, 0.035);
+  }
+
+  .chat-dark-v4-identity .chat-primary-cta {
+    color: #ffffff;
+    background: linear-gradient(180deg, #3b9bff 0%, #0a84ff 54%, #0874df 100%);
+    box-shadow:
+      0 8px 22px rgba(10, 132, 255, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  }
+
+  .chat-dark-v4-identity .chat-primary-cta:hover {
+    background: linear-gradient(180deg, #55a8ff 0%, #168cff 54%, #0a78e5 100%);
+  }
+
+  .chat-dark-v4-identity .chat-primary-cta:active {
+    background: #0874df;
+  }
+
+  .chat-dark-v4-identity .chat-conversation-rail a:not([aria-current='page']):hover,
+  .chat-dark-v4-identity aside nav a:hover,
+  .chat-dark-v4-identity aside button:hover {
+    color: var(--color-foreground);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .chat-dark-v4-identity .material-selected,
+  .chat-dark-v4-identity .chat-conversation-selected {
+    border-color: rgba(104, 160, 255, 0.36);
+    color: var(--color-foreground);
+    background:
+      linear-gradient(145deg, rgba(59, 126, 255, 0.24), rgba(124, 92, 246, 0.13)),
+      rgba(255, 255, 255, 0.075);
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  }
+
+  .chat-dark-v4-identity .material-selected::after,
+  .chat-dark-v4-identity .chat-conversation-selected::after {
+    background:
+      radial-gradient(circle at 4% -16%, rgba(255, 255, 255, 0.26) 0 13%, transparent 34%),
+      radial-gradient(circle at 103% 70%, rgba(100, 210, 255, 0.25) 0 7%, transparent 27%);
+    opacity: 0.86;
+  }
+
+  .chat-dark-v4-identity .material-knowledge,
+  .chat-dark-v4-identity .chat-message-assistant-surface {
+    border-color: rgba(222, 230, 244, 0.18);
+    background: rgba(63, 65, 73, 0.985);
+    box-shadow:
+      0 14px 34px rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  }
+
+  .chat-dark-v4-identity .chat-message-user-surface {
+    border-color: rgba(100, 210, 255, 0.2);
+    color: #ffffff;
+    background: linear-gradient(145deg, rgba(10, 132, 255, 0.94), rgba(70, 88, 220, 0.88));
+    box-shadow:
+      0 10px 28px rgba(10, 132, 255, 0.21),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+
+  .chat-dark-v4-identity .chat-message-user-surface time {
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .chat-dark-v4-identity .chat-message-assistant-avatar {
+    border-color: rgba(100, 210, 255, 0.2);
+    color: var(--color-primary);
+    background: rgba(12, 21, 41, 0.94) !important;
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  }
+
+  .chat-dark-v4-identity .chat-message-sources {
+    border-color: rgba(218, 228, 246, 0.16);
+  }
+
+  .chat-dark-v4-identity .chat-source-list {
+    border-color: rgba(100, 223, 255, 0.12);
+    background: rgba(18, 23, 31, 0.48) !important;
+  }
+
+  .chat-dark-v4-identity .chat-citation-source {
+    border-color: rgba(205, 219, 242, 0.15);
+    background: rgba(35, 40, 50, 0.96) !important;
+    box-shadow:
+      0 7px 18px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  }
+
+  .chat-dark-v4-identity .chat-citation-source:hover {
+    border-color: rgba(100, 223, 255, 0.36);
+    background: rgba(45, 52, 64, 0.98) !important;
+  }
+
+  .chat-dark-v4-identity .chat-citation-source-icon {
+    color: var(--color-evidence);
+    background: var(--color-evidence-soft);
+  }
+
+  .chat-dark-v4-identity .chat-composer-dock {
+    border-color: rgba(184, 202, 230, 0.12);
+    background: rgba(31, 34, 42, 0.78);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  }
+
+  .chat-dark-v4-identity .chat-composer-shell {
+    border-color: rgba(222, 232, 250, 0.22);
+    background: rgba(58, 61, 70, 0.9) !important;
+    box-shadow:
+      0 18px 44px rgba(0, 0, 0, 0.3),
+      0 4px 14px rgba(10, 132, 255, 0.07),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .chat-dark-v4-identity .chat-composer-shell::after {
+    background:
+      radial-gradient(circle at -2% 26%, rgba(100, 210, 255, 0.28) 0 7%, transparent 25%),
+      radial-gradient(circle at 72% 104%, rgba(191, 90, 242, 0.18) 0 7%, transparent 25%),
+      radial-gradient(circle at 102% 5%, rgba(255, 255, 255, 0.18) 0 8%, transparent 24%);
+    opacity: 0.76;
+  }
+
+  .chat-dark-v4-identity .chat-composer-input-surface {
+    border-color: rgba(218, 228, 246, 0.16);
+    background: rgba(42, 46, 56, 0.88) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  .chat-dark-v4-identity .chat-inline-citation {
+    display: inline-flex;
+    min-width: 1.8rem;
+    min-height: 1.75rem;
+    align-items: center;
+    justify-content: center;
+    margin-inline: 0.08rem;
+    padding-inline: 0.32rem;
+    border: 1px solid rgba(100, 223, 255, 0.2);
+    border-radius: var(--radius-control);
+    color: var(--color-evidence);
+    background: var(--color-evidence-soft);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: var(--text-caption);
+    font-weight: 700;
+    line-height: 1;
+    vertical-align: middle;
+    transition:
+      border-color 150ms ease,
+      color 150ms ease,
+      background-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .chat-dark-v4-identity .chat-inline-citation:hover,
+  .chat-dark-v4-identity .chat-inline-citation:focus-visible,
+  .chat-dark-v4-identity .chat-inline-citation.is-active {
+    border-color: rgba(100, 223, 255, 0.64);
+    color: #d9f8ff;
+    background: rgba(100, 223, 255, 0.22);
+    box-shadow: 0 0 0 3px rgba(100, 223, 255, 0.09);
+    outline: none;
+  }
+
+  .chat-dark-v4-identity .chat-source-receipts {
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
+  }
+
+  .chat-dark-v4-identity .chat-citation-receipt {
+    min-height: 2.9rem;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(218, 228, 246, 0.1) !important;
+    border-radius: 0 !important;
+    padding: 0.65rem 0.35rem !important;
+    color: var(--color-secondary);
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .chat-dark-v4-identity .chat-citation-receipt:last-child {
+    border-bottom: 0;
+  }
+
+  .chat-dark-v4-identity .chat-citation-receipt:hover,
+  .chat-dark-v4-identity .chat-citation-receipt:focus-visible,
+  .chat-dark-v4-identity .chat-citation-receipt.is-active,
+  .chat-dark-v4-identity .chat-citation-receipt[data-active='true'] {
+    border-color: rgba(100, 223, 255, 0.2);
+    border-radius: var(--radius-control) !important;
+    background: rgba(100, 223, 255, 0.09) !important;
+    box-shadow: inset 3px 0 0 rgba(100, 223, 255, 0.72);
+  }
+
+  .chat-dark-v4-identity .chat-citation-receipt .chat-citation-source-icon {
+    display: none !important;
+  }
+
+  .chat-dark-v4-identity .chat-citation-source-label {
+    color: var(--color-evidence);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .chat-dark-v4-identity .chat-composer-send {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    padding: 0;
+    border-radius: 9999px;
+    color: #ffffff;
+    background: linear-gradient(180deg, #46a8ff 0%, #0a84ff 54%, #176ee4 100%);
+    box-shadow:
+      0 7px 18px rgba(10, 132, 255, 0.27),
+      inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  }
+
+  .chat-dark-v4-identity .chat-composer-send-label,
+  .chat-dark-v4-identity .chat-composer-send[aria-busy='true'] [role='status'] > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .chat-dark-v4-identity .chat-composer-input-surface textarea {
+    max-height: 7rem;
+  }
+
+  .chat-dark-v4-identity .chat-composer-dock {
+    padding: 0.75rem;
+  }
+
+  .chat-dark-v4-identity .chat-composer-input-surface {
+    padding: 0.45rem;
+    border-radius: var(--radius-action);
+  }
+
+  .chat-dark-v4-identity .chat-message-scroll {
+    padding-block: 1.5rem;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-header h2 {
+    font-size: var(--font-size-heading-1);
+    line-height: var(--line-height-heading-1);
+    font-weight: 700;
+  }
+
+  .chat-dark-v4-identity .chat-conversation-rail h2 {
+    font-size: var(--font-size-heading-2);
+    font-weight: 700;
+  }
+
+  .chat-dark-v4-identity .chat-dark-v4-brand-caption {
+    color: var(--color-subtle);
+    letter-spacing: 0.025em;
+  }
+
+  .chat-dark-v4-identity .app-sidebar-shell nav {
+    margin-top: 1.6rem;
+    gap: 0.35rem;
+  }
+
+  .chat-dark-v4-identity .app-sidebar-shell nav a {
+    min-height: 2.75rem;
+  }
+
+  .chat-dark-v4-identity .app-sidebar-shell > div > div:last-child {
+    padding-top: 0.85rem;
+  }
+
+  @media (min-width: 1024px) {
+    .chat-dark-v4-identity > .app-sidebar-shell {
+      inset-block: 1.25rem;
+      left: 1.25rem;
+      width: 14.5rem;
+      padding: 1rem;
+    }
+
+    .chat-dark-v4-identity > .app-shell-main {
+      margin-left: 15.75rem;
+      padding: 1.25rem;
+    }
+
+    .chat-dark-v4-identity .chat-workspace-composition > div,
+    .chat-dark-v4-identity .chat-workspace-composition > section {
+      height: calc(100svh - 2.5rem);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .chat-dark-v4-identity .chat-workspace-composition {
+      height: calc(100svh - 2.5rem);
+      grid-template-columns: minmax(17.5rem, 19rem) minmax(0, 1fr);
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid rgba(226, 236, 255, 0.22);
+      border-radius: var(--radius-glass);
+      background: rgba(37, 40, 48, 0.9);
+      box-shadow:
+        0 28px 72px rgba(0, 0, 0, 0.38),
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 1px 0 0 rgba(100, 223, 255, 0.035);
+    }
+
+    .chat-dark-v4-identity .chat-workspace-composition > div,
+    .chat-dark-v4-identity .chat-workspace-composition > section {
+      height: 100%;
+      min-height: 0;
+    }
+
+    .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail,
+    .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell {
+      height: 100%;
+      min-height: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail {
+      border-right: 1px solid rgba(218, 228, 246, 0.14);
+    }
+
+    .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail::after,
+    .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell::after {
+      display: none;
+    }
+  }
+
+  .chat-dark-v4-identity .chat-empty-state,
+  .chat-dark-v4-identity .chat-v4-empty-card {
+    border-color: rgba(190, 208, 236, 0.12) !important;
+    border-style: solid !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(100, 210, 255, 0.018)),
+      rgba(12, 18, 34, 0.68) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.065);
+  }
+
+  .chat-dark-v4-identity .animate-skeleton {
+    background: linear-gradient(90deg, #111a2d, #1b2a46, #111a2d);
+  }
+
+  .chat-dark-v4-identity main button[class*='bg-white'],
+  .chat-dark-v4-identity header button,
+  .chat-dark-v4-identity dialog button {
+    border-color: rgba(184, 202, 230, 0.2);
+    color: var(--color-secondary) !important;
+    background: rgba(16, 24, 42, 0.88) !important;
+  }
+
+  .chat-dark-v4-identity main button[class*='bg-white']:hover,
+  .chat-dark-v4-identity header button:hover,
+  .chat-dark-v4-identity dialog button:hover {
+    color: var(--color-foreground) !important;
+    background: rgba(24, 36, 60, 0.94) !important;
+  }
+
+  .chat-dark-v4-identity [role='alert'] {
+    border-color: rgba(255, 107, 97, 0.28);
+    color: #ffd8d5;
+    background: rgba(255, 69, 58, 0.12);
+  }
 }
 
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -770,7 +1342,7 @@
     backdrop-filter: blur(26px) saturate(112%);
   }
 
-  .dashboard-identity .dashboard-action {
+  .overview-identity .overview-action {
     background:
       linear-gradient(150deg, rgba(255, 255, 255, 0.16), rgba(237, 233, 254, 0.06)),
       rgba(255, 255, 255, 0.58);
@@ -786,6 +1358,405 @@
     background:
       linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(237, 233, 254, 0.055)),
       rgba(255, 255, 255, 0.68);
+  }
+
+  .chat-dark-v4-identity .material-navigation {
+    background:
+      linear-gradient(150deg, rgba(255, 255, 255, 0.09), rgba(10, 132, 255, 0.035)),
+      rgba(28, 33, 43, 0.72);
+    -webkit-backdrop-filter: blur(28px) saturate(118%);
+    backdrop-filter: blur(28px) saturate(118%);
+  }
+
+  .chat-dark-v4-identity .chat-conversation-rail {
+    background:
+      linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(124, 92, 246, 0.035)),
+      rgba(29, 33, 42, 0.72);
+    -webkit-backdrop-filter: blur(22px) saturate(112%);
+    backdrop-filter: blur(22px) saturate(112%);
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell {
+    background: rgba(29, 33, 42, 0.76);
+    -webkit-backdrop-filter: blur(22px) saturate(112%);
+    backdrop-filter: blur(22px) saturate(112%);
+  }
+
+  .chat-dark-v4-identity .chat-workspace-header {
+    background: rgba(33, 37, 46, 0.76);
+    -webkit-backdrop-filter: blur(18px) saturate(108%);
+    backdrop-filter: blur(18px) saturate(108%);
+  }
+
+  .chat-dark-v4-identity .chat-composer-dock {
+    background: rgba(24, 28, 36, 0.6);
+    -webkit-backdrop-filter: blur(12px) saturate(106%);
+    backdrop-filter: blur(12px) saturate(106%);
+  }
+
+  .chat-dark-v4-identity .chat-composer-shell {
+    background: rgba(47, 51, 61, 0.78);
+    -webkit-backdrop-filter: blur(28px) saturate(116%);
+    backdrop-filter: blur(28px) saturate(116%);
+  }
+
+  @media (min-width: 1280px) {
+    .chat-dark-v4-identity .chat-workspace-composition {
+      background:
+        linear-gradient(150deg, rgba(255, 255, 255, 0.07), rgba(124, 92, 246, 0.025)),
+        rgba(37, 40, 48, 0.78);
+      -webkit-backdrop-filter: blur(22px) saturate(112%);
+      backdrop-filter: blur(22px) saturate(112%);
+    }
+  }
+}
+
+/* UR-001A V4.2: compact, centered workspace calibration. Keep this route-local so the
+   production Chat surface and all shared light-mode materials remain unchanged. */
+.chat-dark-v4-identity .chat-dark-v4-page-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0 auto 1.1rem;
+  color: var(--color-foreground);
+}
+
+.chat-dark-v4-identity .chat-dark-v4-page-heading h1 {
+  margin: 0;
+  font-size: clamp(1.55rem, 1.1rem + 1.2vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.chat-dark-v4-identity .chat-dark-v4-page-heading p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav {
+  gap: 0.15rem;
+  padding: 0.45rem !important;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav ul {
+  gap: 0.15rem;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav a {
+  gap: 0.65rem;
+  border-color: transparent !important;
+  padding: 0.55rem 0.6rem !important;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav a > span:first-child {
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 0 !important;
+  border-radius: 0.65rem;
+  background: rgba(123, 166, 224, 0.09) !important;
+  box-shadow: none !important;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav a > span:first-child svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav a:not([aria-current='page']):hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav a[aria-current='page'] > span:first-child {
+  background: rgba(59, 155, 255, 0.85) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact {
+  padding: 0.65rem 0.8rem !important;
+  border-top-color: rgba(184, 202, 230, 0.1) !important;
+  background: rgba(20, 24, 34, 0.42) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-shell {
+  border-color: rgba(218, 228, 246, 0.13) !important;
+  background: rgba(45, 49, 59, 0.72) !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-input-surface {
+  padding: 0.3rem 0.4rem !important;
+  border-color: rgba(218, 228, 246, 0.11) !important;
+  background: rgba(34, 38, 48, 0.78) !important;
+  box-shadow: none !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-input-surface textarea {
+  min-height: 2.45rem;
+  line-height: 1.35;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-send {
+  width: 2.25rem;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+}
+
+.chat-dark-v4-identity :where(.material-navigation, .material-workspace, .material-interaction) {
+  border-color: rgba(190, 208, 236, 0.12) !important;
+}
+
+.chat-dark-v4-identity
+  :where(.material-navigation, .material-workspace, .material-interaction)::after,
+.overview-v4-identity
+  :where(.material-navigation, .material-workspace, .material-interaction)::after {
+  background:
+    radial-gradient(circle at 4% -6%, rgba(255, 255, 255, 0.19) 0 7%, transparent 25%),
+    radial-gradient(circle at 102% 48%, rgba(100, 210, 255, 0.12) 0 5%, transparent 20%),
+    radial-gradient(circle at 74% 104%, rgba(191, 90, 242, 0.09) 0 5%, transparent 18%) !important;
+  opacity: 0.42 !important;
+}
+
+@media (min-width: 1024px) {
+  .chat-dark-v4-identity {
+    --chat-v4-group-gap: 1.25rem;
+    --chat-v4-group-half: min(45rem, calc(50vw - 1rem));
+    --chat-v4-group-width: min(90rem, calc(100vw - 2rem));
+    --chat-v4-sidebar-width: 17rem;
+  }
+
+  .chat-dark-v4-identity > .app-sidebar-shell {
+    inset-block: 1rem;
+    left: max(1rem, calc(50% - var(--chat-v4-group-half)));
+    width: var(--chat-v4-sidebar-width);
+    padding: 0.85rem;
+    border-color: rgba(210, 225, 249, 0.15) !important;
+    background: rgba(28, 33, 43, 0.82) !important;
+    box-shadow:
+      0 22px 54px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .chat-dark-v4-identity > .app-shell-main {
+    width: calc(
+      var(--chat-v4-group-width) - var(--chat-v4-sidebar-width) - var(--chat-v4-group-gap)
+    );
+    max-width: none;
+    margin-left: calc(
+      50% - var(--chat-v4-group-half) + var(--chat-v4-sidebar-width) + var(--chat-v4-group-gap)
+    );
+    padding: 1.1rem 0 1.5rem;
+  }
+
+  .chat-dark-v4-identity > .app-shell-main > .app-shell-content {
+    max-width: none;
+  }
+
+  .chat-dark-v4-identity .chat-dark-v4-page-heading {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .chat-dark-v4-identity .chat-workspace-composition {
+    width: 100%;
+    height: min(68rem, calc(100svh - 9rem));
+    min-height: 38rem;
+    grid-template-columns: minmax(15rem, 17rem) minmax(0, 1fr);
+    border-color: rgba(226, 236, 255, 0.15) !important;
+    background: rgba(37, 40, 48, 0.78) !important;
+    box-shadow:
+      0 24px 58px rgba(0, 0, 0, 0.34),
+      0 4px 14px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 1px 0 0 rgba(100, 223, 255, 0.026) !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail,
+  .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail {
+    border-right: 1px solid rgba(218, 228, 246, 0.1) !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell {
+    border-left: 0 !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-header {
+    border-bottom-color: rgba(218, 228, 246, 0.1) !important;
+    background: rgba(39, 42, 50, 0.72) !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail > :first-child,
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail > :last-child {
+    background: rgba(39, 42, 50, 0.67) !important;
+  }
+}
+
+/* UR-001A V4.3: refine the accepted V4.2 composition without changing the light product routes. */
+.chat-dark-v4-identity .chat-message-assistant {
+  gap: 0;
+}
+
+.chat-dark-v4-identity .chat-message-assistant-surface {
+  width: 100%;
+  max-inline-size: min(100%, 46rem);
+  margin-inline: auto;
+  background: rgba(63, 65, 73, 0.985) !important;
+}
+
+.chat-dark-v4-identity .chat-inline-citation {
+  min-width: 1.45rem;
+  min-height: 1.3rem;
+  margin-inline: 0.06rem;
+  padding-inline: 0.2rem;
+  border-color: rgba(100, 223, 255, 0.16);
+  border-radius: 0.35rem;
+  background: rgba(100, 223, 255, 0.08);
+  font-size: 0.6rem;
+  letter-spacing: 0.01em;
+  vertical-align: baseline;
+}
+
+.chat-dark-v4-identity .chat-inline-citation:hover,
+.chat-dark-v4-identity .chat-inline-citation:focus-visible,
+.chat-dark-v4-identity .chat-inline-citation.is-active {
+  border-color: rgba(100, 223, 255, 0.64);
+  background: rgba(100, 223, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(100, 223, 255, 0.09);
+}
+
+.chat-dark-v4-identity :where(.material-navigation, .material-workspace, .material-interaction),
+.overview-v4-identity :where(.material-navigation, .material-workspace, .material-interaction) {
+  border-color: rgba(190, 208, 236, 0.085) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(100, 210, 255, 0.018)),
+    rgba(28, 33, 43, 0.58) !important;
+}
+
+.chat-dark-v4-identity
+  :where(.material-navigation, .material-workspace, .material-interaction)::before,
+.overview-v4-identity
+  :where(.material-navigation, .material-workspace, .material-interaction)::before {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 1px 0 0 rgba(100, 210, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22) !important;
+}
+
+.chat-dark-v4-identity
+  :where(.material-navigation, .material-workspace, .material-interaction)::after,
+.overview-v4-identity
+  :where(.material-navigation, .material-workspace, .material-interaction)::after {
+  opacity: 0.46 !important;
+}
+
+.chat-dark-v4-identity .material-navigation,
+.overview-v4-identity .material-navigation {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(59, 155, 255, 0.04)),
+    rgba(28, 33, 43, 0.54) !important;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail,
+.chat-dark-v4-identity .chat-workspace-shell {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(124, 92, 246, 0.03)),
+    rgba(29, 33, 42, 0.58) !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-header,
+.chat-dark-v4-identity .chat-conversation-rail > :first-child,
+.chat-dark-v4-identity .chat-conversation-rail > :last-child {
+  background: rgba(39, 42, 50, 0.54) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact {
+  padding: 0.45rem 0.6rem !important;
+  background: rgba(20, 24, 34, 0.24) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-shell {
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(100, 210, 255, 0.025)),
+    rgba(45, 49, 59, 0.52) !important;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-input-surface {
+  padding: 0.2rem 0.3rem !important;
+  border-radius: 1rem;
+  background: rgba(34, 38, 48, 0.6) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-input-surface textarea {
+  min-height: 2.15rem;
+  line-height: 1.3;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-input-surface p {
+  color: var(--color-subtle) !important;
+}
+
+.chat-dark-v4-identity .chat-composer-compact .chat-composer-send {
+  width: 2.1rem;
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail nav a[aria-current='page'] {
+  border-color: rgba(104, 160, 255, 0.36) !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell > section {
+  min-height: 0 !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-message-scroll {
+  min-height: 0 !important;
+  overflow-y: auto;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-dock {
+  flex: 0 0 auto;
+}
+
+@media (min-width: 1280px) {
+  .chat-dark-v4-identity .chat-workspace-composition {
+    column-gap: 0 !important;
+    row-gap: 0 !important;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(124, 92, 246, 0.035)),
+      rgba(37, 40, 48, 0.5) !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail,
+  .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell {
+    border-color: transparent !important;
+    background: transparent !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail {
+    border-right-color: rgba(218, 228, 246, 0.1) !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .chat-dark-v4-identity .chat-inline-citation {
+    min-width: 1.65rem;
+    min-height: 1.75rem;
+    padding-inline: 0.28rem;
   }
 }
 
@@ -833,6 +1804,929 @@
     .documents-identity .documents-control-bar {
       background: rgba(255, 255, 255, 0.78);
     }
+
+    .chat-dark-v4-identity .ambient-light-field--blue {
+      opacity: 0.48;
+    }
+
+    .chat-dark-v4-identity .ambient-light-field--violet {
+      opacity: 0.38;
+    }
+
+    .chat-dark-v4-identity .ambient-light-field--lower {
+      opacity: 0.3;
+    }
+
+    .chat-dark-v4-identity .material-navigation {
+      background: rgba(8, 13, 28, 0.88);
+    }
+
+    .chat-dark-v4-identity .chat-conversation-rail,
+    .chat-dark-v4-identity .chat-workspace-shell {
+      background: rgba(10, 16, 32, 0.88);
+    }
+
+    .chat-dark-v4-identity .chat-workspace-header {
+      background: rgba(11, 17, 33, 0.84);
+    }
+
+    .chat-dark-v4-identity .chat-composer-dock {
+      background: rgba(6, 10, 21, 0.82);
+    }
+
+    .chat-dark-v4-identity .chat-composer-shell {
+      background: rgba(12, 19, 37, 0.9);
+    }
+  }
+}
+
+/* Threads V4 material hierarchy. The aurora remains the environmental layer;
+   chrome transmits it, the conversation canvas stays calmer, and knowledge remains near-opaque. */
+.chat-dark-v4-identity {
+  --chat-v4-outer-glass: rgba(9, 14, 24, 0.58);
+  --chat-v4-chat-canvas: rgba(42, 44, 51, 0.9);
+  --chat-v4-knowledge-surface: rgba(72, 74, 81, 0.985);
+}
+
+.chat-dark-v4-identity > .app-sidebar-shell.material-navigation,
+.overview-v4-identity > .app-sidebar-shell.material-navigation {
+  border-color: var(--v4-shell-edge, rgba(210, 225, 249, 0.105)) !important;
+  background:
+    linear-gradient(145deg, rgba(59, 155, 255, 0.08), transparent 35%),
+    linear-gradient(325deg, rgba(191, 90, 242, 0.065), transparent 42%),
+    var(--chat-v4-outer-glass, var(--overview-v4-outer-glass)) !important;
+  box-shadow: var(
+    --v4-shell-shadow,
+    0 24px 60px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.105),
+    inset 1px 0 0 rgba(100, 210, 255, 0.035)
+  ) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(118%);
+  backdrop-filter: blur(24px) saturate(118%);
+}
+
+.chat-dark-v4-identity .chat-conversation-rail,
+.chat-dark-v4-identity .chat-workspace-shell {
+  border-color: rgba(210, 225, 249, 0.1) !important;
+  background:
+    linear-gradient(145deg, rgba(59, 155, 255, 0.055), transparent 38%),
+    linear-gradient(325deg, rgba(191, 90, 242, 0.045), transparent 44%), var(--chat-v4-outer-glass) !important;
+  box-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(116%);
+  backdrop-filter: blur(22px) saturate(116%);
+}
+
+.chat-dark-v4-identity .chat-workspace-shell {
+  overflow: clip !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell > section {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 36%), var(--chat-v4-chat-canvas) !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-header {
+  border-bottom-color: rgba(218, 228, 246, 0.085) !important;
+  background-color: rgba(35, 38, 45, 0.91) !important;
+  background-image: none !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16) !important;
+}
+
+.chat-dark-v4-identity .chat-conversation-rail > :first-child,
+.chat-dark-v4-identity .chat-conversation-rail > :last-child {
+  background-color: rgba(12, 17, 27, 0.52) !important;
+  background-image: none !important;
+}
+
+.chat-dark-v4-identity .chat-message-assistant-surface {
+  background: var(--chat-v4-knowledge-surface) !important;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.085) !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact.chat-composer-dock {
+  padding: 0.55rem 0.8rem 0.45rem !important;
+  border-top-color: rgba(218, 228, 246, 0.08) !important;
+  background-color: rgba(18, 22, 30, 0.3) !important;
+  background-image: linear-gradient(
+    90deg,
+    rgba(100, 210, 255, 0.025),
+    rgba(191, 90, 242, 0.035)
+  ) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-shell {
+  padding: 0 !important;
+  border-color: transparent !important;
+  border-radius: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-shell::before,
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-shell::after {
+  content: none !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-input-surface {
+  display: flex;
+  min-height: 3.1rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin-inline: 1rem;
+  padding: 0.32rem 0.68rem 0.32rem 1rem !important;
+  border-color: rgba(218, 228, 246, 0.11) !important;
+  border-radius: 9999px;
+  background-color: rgba(62, 59, 72, 0.5) !important;
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.045),
+    rgba(124, 92, 246, 0.035) 58%,
+    rgba(100, 210, 255, 0.025)
+  ) !important;
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 1px 0 0 rgba(100, 210, 255, 0.035) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(114%);
+  backdrop-filter: blur(20px) saturate(114%);
+}
+
+.chat-dark-v4-identity
+  .chat-workspace-shell
+  .chat-composer-compact
+  .chat-composer-input-surface
+  textarea {
+  min-width: 0;
+  min-height: 2rem;
+  flex: 1 1 auto;
+  padding: 0.3rem 0;
+  line-height: 1.35;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-helper {
+  min-height: 1rem;
+  margin-top: 0.38rem;
+  padding-inline: 1rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-helper p {
+  color: rgba(174, 185, 207, 0.68) !important;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-send {
+  width: 2.1rem;
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+  flex: 0 0 2.1rem;
+  border-color: rgba(155, 217, 255, 0.2);
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-send:disabled {
+  opacity: 0.76;
+}
+
+.chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-status {
+  margin-top: 0.35rem;
+}
+
+@media (min-width: 1280px) {
+  .chat-dark-v4-identity .chat-workspace-composition {
+    border-color: rgba(210, 225, 249, 0.105) !important;
+    background:
+      linear-gradient(145deg, rgba(59, 155, 255, 0.055), transparent 38%),
+      linear-gradient(325deg, rgba(191, 90, 242, 0.045), transparent 44%),
+      var(--chat-v4-outer-glass) !important;
+    box-shadow:
+      0 28px 68px rgba(0, 0, 0, 0.36),
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      inset 1px 0 0 rgba(100, 210, 255, 0.03) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(116%);
+    backdrop-filter: blur(22px) saturate(116%);
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition > div,
+  .chat-dark-v4-identity .chat-workspace-composition > section {
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-conversation-rail,
+  .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-composition .chat-workspace-shell > section {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 36%),
+      var(--chat-v4-chat-canvas) !important;
+  }
+}
+
+/* These properties already have important declarations in the shared component layer.
+   Keep the Threads overrides in that layer so the calibrated material values win predictably. */
+@layer components {
+  .chat-dark-v4-identity .chat-workspace-shell .chat-workspace-header {
+    background-color: rgba(35, 38, 45, 0.91) !important;
+    background-image: none !important;
+  }
+
+  .chat-dark-v4-identity .chat-conversation-rail > :first-child,
+  .chat-dark-v4-identity .chat-conversation-rail > :last-child {
+    background-color: rgba(12, 17, 27, 0.52) !important;
+    background-image: none !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-shell {
+    background: transparent !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-input-surface {
+    background-color: rgba(62, 59, 72, 0.5) !important;
+    background-image: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(124, 92, 246, 0.035) 58%,
+      rgba(100, 210, 255, 0.025)
+    ) !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .chat-dark-v4-identity .chat-workspace-composition > div,
+  .chat-dark-v4-identity .chat-workspace-composition > .chat-workspace-shell {
+    height: calc(100svh - 10.75rem) !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact.chat-composer-dock {
+    padding-inline: 0.55rem !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-input-surface {
+    min-height: 2.85rem;
+    margin-inline: 0.85rem;
+    padding-left: 0.85rem !important;
+    padding-right: 0.6rem !important;
+  }
+
+  .chat-dark-v4-identity .chat-workspace-shell .chat-composer-compact .chat-composer-helper {
+    padding-inline: 0.85rem;
+    font-size: 0.625rem;
+  }
+
+  .chat-dark-v4-identity
+    .chat-workspace-shell
+    .chat-composer-compact
+    .chat-composer-input-surface
+    textarea {
+    font-size: 0.75rem;
+  }
+}
+
+/* Overview V4 rollout: reuse the approved Chat V4 environment and shell while
+   keeping Overview information grouped on calmer, near-opaque surfaces. */
+.overview-v4-identity {
+  --overview-v4-outer-glass: rgba(9, 14, 24, 0.58);
+  --overview-v4-card-surface:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(100, 210, 255, 0.025)),
+    rgba(28, 33, 43, 0.54);
+  --color-status-ready-foreground: #9ee7bb;
+  --color-status-ready-background: rgba(34, 197, 94, 0.12);
+  --color-status-ready-border: rgba(74, 222, 128, 0.34);
+  --color-status-processing-foreground: #f7cf79;
+  --color-status-processing-background: rgba(245, 158, 11, 0.12);
+  --color-status-processing-border: rgba(251, 191, 36, 0.34);
+  --color-status-failed-foreground: #ffaaa3;
+  --color-status-failed-background: rgba(255, 69, 58, 0.12);
+  --color-status-failed-border: rgba(255, 107, 97, 0.34);
+}
+
+.overview-v4-identity > header.material-workspace {
+  border-color: rgba(184, 202, 230, 0.13);
+  background: rgba(8, 13, 25, 0.9) !important;
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.28),
+    inset 0 -1px 0 rgba(100, 210, 255, 0.055);
+}
+
+.overview-v4-identity .app-sidebar-shell nav {
+  margin-top: 1.6rem;
+  gap: 0.35rem;
+}
+
+.overview-v4-identity .app-sidebar-shell nav a {
+  min-height: 2.75rem;
+}
+
+.overview-v4-identity .app-sidebar-shell > div > div:last-child {
+  padding-top: 0.85rem;
+  border-color: rgba(184, 202, 230, 0.13);
+}
+
+.chat-dark-v4-identity aside nav a:hover,
+.chat-dark-v4-identity aside button:hover,
+.overview-v4-identity aside nav a:hover,
+.overview-v4-identity aside button:hover {
+  color: var(--color-foreground);
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.chat-dark-v4-identity .material-selected,
+.overview-v4-identity .material-selected {
+  border-color: rgba(104, 160, 255, 0.36);
+  color: var(--color-primary);
+  background:
+    linear-gradient(145deg, rgba(59, 126, 255, 0.24), rgba(124, 92, 246, 0.13)),
+    rgba(255, 255, 255, 0.075);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+
+.chat-dark-v4-identity .material-selected::after,
+.overview-v4-identity .material-selected::after {
+  background:
+    radial-gradient(circle at 4% -16%, rgba(255, 255, 255, 0.26) 0 13%, transparent 34%),
+    radial-gradient(circle at 103% 70%, rgba(100, 210, 255, 0.25) 0 7%, transparent 27%);
+  opacity: 0.86;
+}
+
+.overview-v4-identity .chat-dark-v4-brand-caption {
+  color: var(--color-subtle);
+  letter-spacing: 0.025em;
+}
+
+.overview-v4-identity > header button,
+.overview-v4-identity dialog button {
+  border-color: rgba(184, 202, 230, 0.18);
+  color: var(--color-secondary) !important;
+  background: rgba(18, 24, 36, 0.9) !important;
+}
+
+.overview-v4-identity dialog.material-navigation {
+  border-color: rgba(210, 225, 249, 0.12);
+  background:
+    linear-gradient(145deg, rgba(59, 155, 255, 0.07), transparent 36%),
+    linear-gradient(325deg, rgba(191, 90, 242, 0.055), transparent 42%), rgba(9, 14, 24, 0.9) !important;
+}
+
+.overview-v4-identity .overview-v4-page-heading h1 {
+  font-size: clamp(1.7rem, 1.2rem + 1.25vw, 2.45rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.overview-v4-identity .overview-v4-page-heading p {
+  max-width: 44rem;
+  color: var(--color-muted);
+}
+
+.overview-v4-identity .overview-v4-workspace {
+  border-color: rgba(137, 161, 201, 0.055);
+  background:
+    linear-gradient(145deg, rgba(59, 155, 255, 0.055), transparent 38%),
+    linear-gradient(325deg, rgba(191, 90, 242, 0.045), transparent 44%),
+    var(--overview-v4-outer-glass) !important;
+  box-shadow:
+    0 28px 68px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(116%);
+  backdrop-filter: blur(22px) saturate(116%);
+}
+
+.overview-v4-identity .overview-v4-workspace::before {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.075),
+    inset 1px 0 0 rgba(100, 210, 255, 0.015),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32);
+}
+
+.overview-v4-identity .overview-v4-workspace::after {
+  opacity: 0.42;
+}
+
+.overview-v4-identity .overview-v4-action {
+  border-color: rgba(190, 208, 236, 0.1);
+  background: var(--overview-v4-card-surface) !important;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.105) !important;
+}
+
+.overview-v4-identity .overview-v4-action:hover {
+  border-color: rgba(83, 169, 255, 0.34);
+  background:
+    linear-gradient(145deg, rgba(59, 155, 255, 0.12), rgba(100, 210, 255, 0.035)),
+    rgba(34, 40, 52, 0.7) !important;
+}
+
+.overview-v4-identity .overview-v4-onboarding,
+.overview-v4-identity .overview-stat-card,
+.overview-v4-identity .overview-v4-section {
+  border-color: rgba(190, 208, 236, 0.1);
+  background: var(--overview-v4-card-surface) !important;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.105) !important;
+}
+
+.overview-v4-identity .overview-stat-card dd {
+  font-size: clamp(1.45rem, 1.15rem + 0.8vw, 2rem);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.overview-v4-identity .overview-stat-icon {
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.065);
+}
+
+.overview-v4-identity .overview-stat-card[data-stat='all'] .overview-stat-icon,
+.overview-v4-identity .overview-document-icon {
+  color: var(--color-evidence);
+  background: var(--color-evidence-soft);
+}
+
+.overview-v4-identity .overview-v4-section {
+  padding: 1rem;
+}
+
+.overview-v4-identity .overview-v4-section > div:first-child {
+  padding-inline: 0.25rem;
+}
+
+.overview-v4-identity .overview-v4-section > div:last-child {
+  margin-top: 0.75rem;
+}
+
+.overview-v4-identity .overview-v4-rows {
+  border-color: rgba(218, 228, 246, 0.09);
+}
+
+.overview-v4-identity .overview-v4-row {
+  border-color: rgba(218, 228, 246, 0.085);
+}
+
+.overview-v4-identity .overview-v4-row-link:hover {
+  background: rgba(59, 155, 255, 0.08);
+}
+
+.overview-v4-identity .overview-conversation-icon {
+  border: 1px solid rgba(59, 155, 255, 0.13);
+  background: rgba(59, 155, 255, 0.12);
+}
+
+.overview-v4-identity .overview-attention-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.overview-v4-identity .overview-attention-section:has(.overview-attention-row) {
+  border-color: rgba(255, 107, 97, 0.2);
+  background:
+    linear-gradient(135deg, rgba(255, 69, 58, 0.06), transparent 46%),
+    var(--overview-v4-card-surface) !important;
+  box-shadow:
+    inset 3px 0 0 rgba(255, 107, 97, 0.48),
+    0 12px 30px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+}
+
+.overview-v4-identity .overview-attention-row {
+  border-color: rgba(255, 107, 97, 0.14);
+  background: rgba(255, 69, 58, 0.075) !important;
+}
+
+.overview-v4-identity .overview-attention-icon {
+  border: 1px solid rgba(255, 107, 97, 0.14);
+  background: rgba(255, 69, 58, 0.11);
+}
+
+.overview-v4-identity .overview-attention-calm {
+  border-color: rgba(74, 222, 128, 0.12);
+  color: var(--color-foreground);
+  background: rgba(34, 197, 94, 0.055) !important;
+}
+
+.overview-v4-identity .overview-v4-empty-state {
+  border-color: rgba(190, 208, 236, 0.1) !important;
+  border-style: solid !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(100, 210, 255, 0.018)),
+    rgba(12, 18, 34, 0.58) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.overview-v4-identity .animate-skeleton {
+  background: linear-gradient(90deg, #202630, #303845, #202630);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .overview-v4-identity > .app-sidebar-shell.material-navigation {
+    -webkit-backdrop-filter: blur(24px) saturate(118%);
+    backdrop-filter: blur(24px) saturate(118%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .overview-v4-identity {
+    --overview-v4-group-gap: 1.25rem;
+    --overview-v4-group-half: min(45rem, calc(50vw - 1rem));
+    --overview-v4-group-width: min(90rem, calc(100vw - 2rem));
+    --overview-v4-sidebar-width: 17rem;
+  }
+
+  .overview-v4-identity > .app-sidebar-shell {
+    inset-block: 1rem;
+    left: max(1rem, calc(50% - var(--overview-v4-group-half)));
+    width: var(--overview-v4-sidebar-width);
+    padding: 0.85rem;
+  }
+
+  .overview-v4-identity > .app-shell-main {
+    width: calc(
+      var(--overview-v4-group-width) - var(--overview-v4-sidebar-width) -
+        var(--overview-v4-group-gap)
+    );
+    max-width: none;
+    margin-left: calc(
+      50% - var(--overview-v4-group-half) + var(--overview-v4-sidebar-width) +
+        var(--overview-v4-group-gap)
+    );
+    padding: 1.1rem 0 2rem;
+  }
+
+  .overview-v4-identity > .app-shell-main > .app-shell-content {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .overview-v4-identity .overview-sections-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overview-v4-identity .overview-attention-section {
+    grid-column: span 2 / span 2;
+  }
+}
+
+@media (max-width: 639px) {
+  .overview-v4-identity .ambient-light-field--blue {
+    opacity: 0.48;
+  }
+
+  .overview-v4-identity .ambient-light-field--violet {
+    opacity: 0.38;
+  }
+
+  .overview-v4-identity .ambient-light-field--lower {
+    opacity: 0.3;
+  }
+
+  .overview-v4-identity .overview-v4-workspace {
+    -webkit-backdrop-filter: blur(18px) saturate(112%);
+    backdrop-filter: blur(18px) saturate(112%);
+  }
+
+  .overview-v4-identity .overview-v4-section,
+  .overview-v4-identity .overview-stat-card {
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+  }
+}
+
+/* Documents V4 list rollout: the existing server-backed library adopts the
+   approved dark workspace shell while preserving its responsive interaction model. */
+.documents-v4-identity {
+  --documents-v4-outer-glass: rgba(9, 14, 24, 0.58);
+  --documents-v4-control-surface: rgba(47, 51, 61, 0.78);
+  --documents-v4-content-surface: rgba(36, 39, 47, 0.94);
+  --color-status-ready-foreground: #9ee7bb;
+  --color-status-ready-background: rgba(34, 197, 94, 0.12);
+  --color-status-ready-border: rgba(74, 222, 128, 0.34);
+  --color-status-processing-foreground: #f7cf79;
+  --color-status-processing-background: rgba(245, 158, 11, 0.12);
+  --color-status-processing-border: rgba(251, 191, 36, 0.34);
+  --color-status-failed-foreground: #ffaaa3;
+  --color-status-failed-background: rgba(255, 69, 58, 0.12);
+  --color-status-failed-border: rgba(255, 107, 97, 0.34);
+}
+
+.documents-v4-identity .documents-v4-page-heading h1 {
+  font-size: clamp(1.7rem, 1.2rem + 1.25vw, 2.45rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.documents-v4-identity .documents-v4-page-heading p {
+  color: var(--color-muted);
+}
+
+.documents-v4-identity .documents-v4-refresh {
+  border-color: rgba(218, 228, 246, 0.19);
+  color: var(--color-foreground);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.documents-v4-identity .documents-v4-refresh:hover {
+  border-color: rgba(83, 169, 255, 0.3);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.documents-v4-identity .documents-v4-upload {
+  border-color: rgba(155, 217, 255, 0.18);
+  background: linear-gradient(180deg, #46a8ff 0%, #0a84ff 54%, #176ee4 100%);
+  box-shadow:
+    0 8px 20px rgba(10, 132, 255, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.documents-v4-identity .documents-v4-upload:hover {
+  background: linear-gradient(180deg, #5bb2ff 0%, #2793ff 54%, #247ae8 100%);
+}
+
+.documents-v4-identity .documents-v4-workspace {
+  border-color: rgba(190, 208, 236, 0.14);
+  background:
+    linear-gradient(145deg, rgba(59, 155, 255, 0.045), transparent 38%),
+    linear-gradient(325deg, rgba(191, 90, 242, 0.035), transparent 44%),
+    var(--documents-v4-outer-glass) !important;
+  box-shadow:
+    0 28px 68px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(116%);
+  backdrop-filter: blur(22px) saturate(116%);
+}
+
+.documents-v4-identity .documents-control-bar {
+  border-bottom: 1px solid rgba(218, 228, 246, 0.1) !important;
+  border-radius: 0;
+  background: var(--documents-v4-control-surface) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+
+.documents-v4-identity .documents-control-bar::before,
+.documents-v4-identity .documents-control-bar::after {
+  content: none !important;
+}
+
+.documents-v4-identity .documents-v4-search {
+  order: -1;
+  width: 100%;
+}
+
+.documents-v4-identity .documents-v4-search label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.documents-v4-identity .documents-v4-search > div {
+  gap: 0;
+}
+
+.documents-v4-identity .documents-v4-search input {
+  min-height: 2.5rem;
+  border-color: rgba(218, 228, 246, 0.12);
+  color: var(--color-foreground);
+  background: rgba(255, 255, 255, 0.095);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.documents-v4-identity .documents-v4-search input:hover {
+  border-color: rgba(83, 169, 255, 0.28);
+}
+
+.documents-v4-identity .documents-v4-search input::placeholder {
+  color: var(--color-muted);
+}
+
+.documents-v4-identity .documents-v4-search button {
+  color: var(--color-muted);
+}
+
+.documents-v4-identity .documents-v4-filter {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.documents-v4-identity .documents-v4-filter:hover {
+  border-color: rgba(218, 228, 246, 0.12);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.documents-v4-identity .documents-v4-filter.is-active {
+  border-color: rgba(218, 228, 246, 0.16);
+  color: var(--color-foreground);
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow:
+    0 5px 14px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.documents-v4-identity .documents-v4-results,
+.documents-v4-identity .documents-library-surface {
+  background: var(--documents-v4-content-surface) !important;
+}
+
+.documents-v4-identity .documents-library-surface {
+  box-shadow: none;
+}
+
+.documents-v4-identity .documents-v4-table-header {
+  border-color: rgba(218, 228, 246, 0.1);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.documents-v4-identity .documents-v4-row {
+  min-height: 3.35rem;
+  border-color: rgba(218, 228, 246, 0.09);
+}
+
+.documents-v4-identity .documents-v4-row:hover,
+.documents-v4-identity .documents-v4-row:focus-within {
+  background: rgba(59, 155, 255, 0.07);
+}
+
+.documents-v4-identity .documents-v4-row a:hover {
+  color: var(--color-primary);
+}
+
+.documents-v4-identity .documents-v4-ordinal {
+  letter-spacing: 0.055em;
+}
+
+.documents-v4-identity .documents-pagination {
+  border-color: rgba(218, 228, 246, 0.1);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.documents-v4-identity .documents-pagination button {
+  border-color: rgba(218, 228, 246, 0.14);
+  color: var(--color-secondary);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.documents-v4-identity .documents-pagination button:hover:not(:disabled) {
+  border-color: rgba(83, 169, 255, 0.28);
+  background: rgba(59, 155, 255, 0.09);
+}
+
+.documents-v4-identity .animate-skeleton {
+  background: linear-gradient(90deg, #202630, #303845, #202630);
+}
+
+/* Document details page (V4) */
+
+.document-details-remove-surface {
+  border-color: rgba(185, 28, 28, 0.16);
+  background: var(--color-danger-soft);
+}
+
+.document-details-remove-button {
+  --tw-shadow: none;
+}
+
+.document-pipeline-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.document-pipeline-step {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  column-gap: 0.75rem;
+}
+
+.document-pipeline-step-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.125rem;
+}
+
+.document-pipeline-step-connector {
+  flex: 1;
+  width: 1px;
+  min-height: 1.25rem;
+  margin-top: 0.375rem;
+  background: var(--color-border-strong);
+}
+
+.document-pipeline-step[data-state='done'] .document-pipeline-step-connector {
+  background: var(--color-status-ready-border);
+}
+
+.document-pipeline-step[data-state='error'] .document-pipeline-step-connector {
+  background: var(--color-status-failed-border);
+}
+
+.document-pipeline-step-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1.15rem;
+}
+
+.document-pipeline-step:last-child .document-pipeline-step-body {
+  padding-bottom: 0;
+}
+
+.documents-v4-identity .document-details-identity {
+  background: var(--documents-v4-content-surface) !important;
+}
+
+.documents-v4-identity .document-details-refresh {
+  border-color: rgba(218, 228, 246, 0.19);
+  color: var(--color-foreground);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.documents-v4-identity .document-details-refresh:hover {
+  border-color: rgba(83, 169, 255, 0.3);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.documents-v4-identity .document-details-knowledge-surface,
+.documents-v4-identity .document-details-decision-surface {
+  border-color: rgba(218, 228, 246, 0.12) !important;
+  background: var(--documents-v4-content-surface) !important;
+  box-shadow: none;
+}
+
+.documents-v4-identity .document-details-back-link:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.documents-v4-identity .document-upload-dropzone {
+  border-color: rgba(218, 228, 246, 0.22) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+.documents-v4-identity .document-upload-dropzone p {
+  color: var(--color-muted);
+}
+
+.documents-v4-identity .document-upload-choose-button {
+  border-color: rgba(218, 228, 246, 0.19) !important;
+  color: var(--color-foreground) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.documents-v4-identity .document-upload-choose-button:hover {
+  border-color: rgba(83, 169, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.documents-v4-identity .document-upload-file-preview {
+  border-color: rgba(218, 228, 246, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.documents-v4-identity .document-details-remove-surface {
+  border-color: rgba(255, 107, 97, 0.22);
+  background: rgba(255, 69, 58, 0.08) !important;
+}
+
+.documents-v4-identity .document-details-remove-surface p {
+  color: var(--color-muted);
+}
+
+@media (min-width: 1280px) {
+  .documents-v4-identity .documents-v4-search {
+    order: 0;
+    width: min(19rem, 100%);
+  }
+}
+
+@media (max-width: 639px) {
+  .documents-v4-identity .documents-v4-workspace {
+    -webkit-backdrop-filter: blur(18px) saturate(112%);
+    backdrop-filter: blur(18px) saturate(112%);
+  }
+
+  .documents-v4-identity .documents-v4-row {
+    min-height: 4.25rem;
   }
 }
 
@@ -850,4 +2744,105 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Shell navigation icon micro-motion (V4 polish) */
+.sidebar-nav-icon {
+  transition:
+    transform 180ms ease-out,
+    filter 180ms ease-out;
+}
+
+.sidebar-nav-link:hover .sidebar-nav-icon,
+.sidebar-nav-link:focus-visible .sidebar-nav-icon {
+  transform: translateY(-1px) scale(1.04);
+  filter: brightness(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-nav-icon {
+    transition: none !important;
+  }
+
+  .sidebar-nav-link:hover .sidebar-nav-icon,
+  .sidebar-nav-link:focus-visible .sidebar-nav-icon {
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Shared route-content transition (V4 polish) */
+@keyframes route-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.route-transition-content {
+  animation: route-fade-in 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-transition-content {
+    animation: none !important;
+  }
+}
+
+/* Auth V4 rollout — Sign In / Sign Up / verify-email / session-check share the
+   Overview dark surface (.overview-v4-identity token set) for the aurora
+   canvas, ambient light and glass chrome, via .auth-v4-identity on the same
+   element. This block only layers the calmer, more opaque form-card and
+   input treatment the auth material hierarchy needs on top of that shared
+   base — it does not redefine any shared token, and mirrors the existing
+   .documents-v4-identity .documents-v4-refresh pattern for the secondary
+   button. */
+.auth-v4-identity .material-workspace {
+  background: rgba(20, 26, 40, 0.92);
+}
+
+.auth-v4-identity input {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.auth-v4-identity input:disabled {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.auth-v4-identity .auth-v4-secondary-button {
+  border-color: rgba(218, 228, 246, 0.19);
+  color: var(--color-foreground);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.auth-v4-identity .auth-v4-secondary-button:hover {
+  border-color: rgba(83, 169, 255, 0.3);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Auth V4 rollout — Alert banners (login/register error, post-registration
+   success) default to a light pastel chip (bg-danger-soft/bg-success-soft +
+   text-*-950), which reads correctly on the app's light surfaces but looks
+   jarring against the dark auth card. This narrowly recolors just the two
+   Alert shapes that actually appear on Sign In / Sign Up — role="alert" is
+   unique to the error variant, and role="status" combined with Alert's own
+   "rounded-control" class (not used by the plain status text elsewhere on
+   these pages) is unique to its success/warning/info chip — without
+   touching the shared Alert component or its tokens used elsewhere. */
+.auth-v4-identity [role='alert'] {
+  background: rgba(255, 85, 105, 0.14) !important;
+  border-color: rgba(255, 120, 140, 0.32) !important;
+  color: #ffd7dc !important;
+}
+
+.auth-v4-identity [role='status'].rounded-control {
+  background: rgba(100, 230, 170, 0.14) !important;
+  border-color: rgba(120, 235, 180, 0.32) !important;
+  color: #d6ffe9 !important;
 }

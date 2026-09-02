@@ -32,18 +32,11 @@ export function DocumentFilters({
 }: DocumentFiltersProps) {
   return (
     <section
-      className="material-interaction documents-control-bar elevation-1 grid min-w-0 gap-5 overflow-hidden rounded-glass border p-4 sm:p-5 xl:grid-cols-[minmax(20rem,1fr)_auto] xl:items-end"
+      className="material-interaction documents-control-bar grid min-w-0 gap-4 border-0 p-4 sm:p-5 xl:grid-cols-[auto_minmax(18rem,1fr)] xl:items-center"
       aria-label="Document filters"
     >
-      <SearchInput
-        label="Search documents"
-        onValueChange={onSearchChange}
-        placeholder="Search by document name…"
-        value={search}
-      />
-
-      <div className="min-w-0 xl:justify-self-end">
-        <p className="mb-2 type-body font-medium text-foreground">Processing status</p>
+      <div className="documents-v4-status-filters min-w-0 xl:row-start-1">
+        <p className="sr-only">Processing status</p>
         <div
           className="grid max-w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap xl:flex-nowrap"
           role="group"
@@ -54,11 +47,11 @@ export function DocumentFilters({
               key={option.value}
               type="button"
               className={cn(
-                'inline-flex min-h-11 min-w-0 items-center justify-between gap-2 rounded-control border px-3.5 type-body font-semibold transition sm:shrink-0 sm:justify-center',
+                'documents-v4-filter inline-flex min-h-10 min-w-0 items-center justify-between gap-2 rounded-control border px-3 type-small font-semibold transition sm:shrink-0 sm:justify-center',
                 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
                 status === option.value
-                  ? 'border-primary/30 bg-primary-soft/95 text-primary shadow-sm'
-                  : 'border-border bg-white/92 text-secondary hover:border-primary/25 hover:bg-white hover:text-foreground',
+                  ? 'is-active border-primary/30 bg-primary-soft/95 text-primary shadow-sm'
+                  : 'border-border text-secondary hover:border-primary/25 hover:text-foreground',
               )}
               aria-pressed={status === option.value}
               onClick={() => onStatusChange(option.value)}
@@ -69,8 +62,8 @@ export function DocumentFilters({
                   className={cn(
                     'min-w-5 rounded-full px-1.5 py-0.5 type-caption',
                     status === option.value
-                      ? 'bg-white/80 text-primary'
-                      : 'bg-slate-100 text-muted',
+                      ? 'bg-primary/15 text-primary'
+                      : 'bg-white/5 text-muted',
                   )}
                 >
                   {counts[option.countKey]}
@@ -81,6 +74,15 @@ export function DocumentFilters({
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="documents-v4-search xl:row-start-1 xl:justify-self-end">
+        <SearchInput
+          label="Search documents"
+          onValueChange={onSearchChange}
+          placeholder="Search documents"
+          value={search}
+        />
       </div>
     </section>
   );

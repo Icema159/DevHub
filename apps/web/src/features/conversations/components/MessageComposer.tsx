@@ -22,6 +22,7 @@ import {
 } from '../use-conversation-messaging';
 
 export interface MessageComposerProps {
+  compact?: boolean;
   disabled: boolean;
   isSubmitting: boolean;
   onSubmit: (content: string) => Promise<MessageSubmissionOutcome>;
@@ -29,6 +30,7 @@ export interface MessageComposerProps {
 }
 
 export function MessageComposer({
+  compact = false,
   disabled,
   isSubmitting,
   onSubmit,
@@ -119,9 +121,84 @@ export function MessageComposer({
     .filter(Boolean)
     .join(' ');
 
+  const textarea = (
+    <textarea
+      ref={textareaRef}
+      id={textareaId}
+      className={cn(
+        'max-h-40 w-full resize-none bg-transparent px-2 py-1.5 type-body text-foreground outline-none placeholder:text-subtle disabled:cursor-not-allowed disabled:text-muted',
+        compact ? 'min-h-12' : 'min-h-20',
+      )}
+      name="message"
+      onChange={(event) => {
+        const nextDraft = event.target.value;
+        setDraft(nextDraft);
+
+        if (validationError) {
+          setValidationError(conversationMessageValidationError(nextDraft));
+        }
+      }}
+      onCompositionEnd={handleComposition}
+      onCompositionStart={handleComposition}
+      onKeyDown={handleKeyDown}
+      placeholder="Ask anything about your knowledge…"
+      readOnly={disabled || isSubmitting}
+      rows={compact ? 1 : 3}
+      value={draft}
+      aria-describedby={describedBy || undefined}
+      aria-invalid={validationError ? 'true' : undefined}
+    />
+  );
+
+  const helper = validationError ? (
+    <p className="text-danger" id={validationId}>
+      {validationError}
+    </p>
+  ) : showCharacterCount ? (
+    <p className="text-muted" aria-live="polite">
+      {characterCount.toLocaleString('en')} / {MAX_CONVERSATION_MESSAGE_LENGTH.toLocaleString('en')}
+    </p>
+  ) : compact ? null : (
+    <p className="text-muted">Enter to send · Shift + Enter for a new line</p>
+  );
+
+  const sendButton = (
+    <Button
+      aria-label="Send message"
+      className="chat-composer-send"
+      disabled={disabled || draft.trim().length === 0}
+      isLoading={isSubmitting}
+      loadingLabel="Sending…"
+      size="small"
+      type="submit"
+    >
+      <Send className="size-4" aria-hidden="true" />
+      <span className="chat-composer-send-label">Send</span>
+    </Button>
+  );
+
+  const submissionStatus = isSubmitting ? (
+    <p
+      className="chat-composer-status mt-2 text-center type-small text-muted"
+      id={pendingId}
+      role="status"
+    >
+      {resource.status === 'submitting' && resource.phase === 'generating'
+        ? 'Generating answer…'
+        : 'Retrieving relevant sources…'}
+    </p>
+  ) : disabled ? (
+    <p className="chat-composer-status mt-2 text-center type-small text-muted" role="status">
+      Another question is still being processed.
+    </p>
+  ) : null;
+
   return (
     <form
-      className="chat-composer-dock relative z-10 border-t border-border/60 bg-white/18 p-3 supports-[backdrop-filter]:backdrop-blur-sm sm:p-4"
+      className={cn(
+        'chat-composer-dock relative z-10 border-t border-border/60 bg-white/18 p-3 supports-[backdrop-filter]:backdrop-blur-sm sm:p-4',
+        compact && 'chat-composer-compact',
+      )}
       onSubmit={handleSubmit}
       aria-busy={isSubmitting || undefined}
     >
@@ -139,77 +216,42 @@ export function MessageComposer({
         <label className="sr-only" htmlFor={textareaId}>
           Message
         </label>
-        <div
-          className={cn(
-            'rounded-card border bg-white/94 p-2 shadow-glass-low transition focus-within:border-primary/55 focus-within:ring-3 focus-within:ring-primary/12',
-            validationError
-              ? 'border-danger focus-within:border-danger focus-within:ring-danger/15'
-              : 'border-border-strong',
-          )}
-        >
-          <textarea
-            ref={textareaRef}
-            id={textareaId}
-            className="max-h-40 min-h-20 w-full resize-none bg-transparent px-2 py-1.5 type-body text-foreground outline-none placeholder:text-subtle disabled:cursor-not-allowed disabled:text-muted"
-            name="message"
-            onChange={(event) => {
-              const nextDraft = event.target.value;
-              setDraft(nextDraft);
-
-              if (validationError) {
-                setValidationError(conversationMessageValidationError(nextDraft));
-              }
-            }}
-            onCompositionEnd={handleComposition}
-            onCompositionStart={handleComposition}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask anything about your knowledge…"
-            readOnly={disabled || isSubmitting}
-            rows={3}
-            value={draft}
-            aria-describedby={describedBy || undefined}
-            aria-invalid={validationError ? 'true' : undefined}
-          />
-
-          <div className="flex items-end justify-between gap-3 px-1 pb-1">
-            <div className="min-w-0 type-caption">
-              {validationError ? (
-                <p className="text-danger" id={validationId}>
-                  {validationError}
-                </p>
-              ) : showCharacterCount ? (
-                <p className="text-muted" aria-live="polite">
-                  {characterCount.toLocaleString('en')} /{' '}
-                  {MAX_CONVERSATION_MESSAGE_LENGTH.toLocaleString('en')}
-                </p>
-              ) : (
-                <p className="text-muted">Enter to send · Shift + Enter for a new line</p>
+        {compact ? (
+          <>
+            <div
+              className={cn(
+                'chat-composer-input-surface chat-composer-pill rounded-card border bg-white/94 p-2 shadow-glass-low transition focus-within:border-primary/55 focus-within:ring-3 focus-within:ring-primary/12',
+                validationError
+                  ? 'border-danger focus-within:border-danger focus-within:ring-danger/15'
+                  : 'border-border-strong',
               )}
-            </div>
-
-            <Button
-              aria-label="Send message"
-              disabled={disabled || draft.trim().length === 0}
-              isLoading={isSubmitting}
-              loadingLabel="Sending…"
-              size="small"
-              type="submit"
             >
-              <Send className="size-4" aria-hidden="true" />
-              Send
-            </Button>
-          </div>
-        </div>
+              {textarea}
+              {sendButton}
+            </div>
+            {helper ? (
+              <div className="chat-composer-helper min-w-0 type-caption">{helper}</div>
+            ) : null}
+          </>
+        ) : (
+          <div
+            className={cn(
+              'chat-composer-input-surface rounded-card border bg-white/94 p-2 shadow-glass-low transition focus-within:border-primary/55 focus-within:ring-3 focus-within:ring-primary/12',
+              validationError
+                ? 'border-danger focus-within:border-danger focus-within:ring-danger/15'
+                : 'border-border-strong',
+            )}
+          >
+            {textarea}
 
-        {isSubmitting ? (
-          <p className="mt-2 text-center type-small text-muted" id={pendingId} role="status">
-            Preparing an answer…
-          </p>
-        ) : disabled ? (
-          <p className="mt-2 text-center type-small text-muted" role="status">
-            Another question is still being processed.
-          </p>
-        ) : null}
+            <div className="flex items-end justify-between gap-3 px-1 pb-1">
+              <div className="min-w-0 type-caption">{helper}</div>
+              {sendButton}
+            </div>
+          </div>
+        )}
+
+        {submissionStatus}
       </div>
     </form>
   );

@@ -194,7 +194,7 @@ describe('application navigation', () => {
 
     expect(screen.getByRole('link', { name: 'Documents' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Documents' })).toHaveClass('material-selected');
-    expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('link', { name: 'Overview' })).not.toHaveAttribute('aria-current');
   });
 
   it('opens and closes mobile navigation', async () => {
@@ -249,11 +249,11 @@ describe('application navigation', () => {
   });
 
   it.each([
-    ['/dashboard', 'Welcome back, Marius'],
+    ['/dashboard', 'Overview'],
     ['/documents', 'Documents'],
     ['/documents/document-id', 'Authentication Guide.pdf'],
-    ['/chat', 'Chat'],
-    ['/chat/conversation-id', 'Chat'],
+    ['/chat', 'Threads'],
+    ['/chat/conversation-id', 'Threads'],
   ])('renders the %s route without crashing', (path, heading) => {
     authenticateTestUser();
     renderApp(path);
@@ -261,7 +261,7 @@ describe('application navigation', () => {
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
   });
 
-  it('keeps the decorative ambient layer scoped to the approved Dashboard, Chat, and Documents workspaces', () => {
+  it('keeps the decorative ambient layer scoped to the approved Overview, Threads, and Documents workspaces', () => {
     authenticateTestUser();
     const { container, unmount } = renderApp('/dashboard');
     const dashboardAmbientLayer = container.querySelector('.ambient-light-layer');
@@ -297,6 +297,24 @@ describe('application navigation', () => {
     expect(documentDetailsAmbientLayer?.querySelectorAll('.ambient-light-field')).toHaveLength(3);
   });
 
+  it('applies the approved Dark V4 identity to the production Threads route', () => {
+    authenticateTestUser();
+    const threadsRender = renderApp('/chat/conversation-id');
+    const threadsCanvas = threadsRender.container.querySelector('.app-canvas');
+
+    expect(threadsCanvas).toHaveClass('chat-identity', 'chat-dark-v4-identity');
+    expect(threadsCanvas?.querySelectorAll('.ambient-light-field')).toHaveLength(3);
+    expect(screen.getByRole('link', { name: 'Threads' })).toHaveAttribute('href', '/chat');
+  });
+
+  it('removes the legacy Dark V4 experiment route after production rollout', () => {
+    authenticateTestUser();
+    renderApp('/experiments/chat-dark-v4/conversation-id');
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Page not found' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: 'Threads' })).not.toBeInTheDocument();
+  });
+
   it('renders the Design System preview route', () => {
     renderApp('/ui-kit');
 
@@ -311,6 +329,22 @@ describe('application navigation', () => {
       'How does JWT authentication work?',
     );
     expect(screen.getByRole('article', { name: 'Assistant message' })).toBeInTheDocument();
+  });
+
+  it('exposes the Design System preview route only outside production builds', () => {
+    vi.stubEnv('DEV', false);
+
+    try {
+      useAuthStore.setState({ status: 'unauthenticated' });
+      renderApp('/ui-kit');
+
+      expect(
+        screen.queryByRole('heading', { level: 1, name: 'Design System' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'Welcome back' })).toBeInTheDocument();
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it('redirects an unauthenticated visitor away from protected routes', () => {
@@ -336,16 +370,14 @@ describe('application navigation', () => {
     renderApp('/chat/conversation-id');
 
     expect(screen.getByRole('heading', { level: 1, name: 'Welcome back' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { level: 1, name: 'Chat' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: 'Threads' })).not.toBeInTheDocument();
   });
 
   it('redirects an authenticated visitor away from public auth routes', () => {
     authenticateTestUser();
     renderApp('/login');
 
-    expect(
-      screen.getByRole('heading', { level: 1, name: 'Welcome back, Marius' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Overview' })).toBeInTheDocument();
   });
 
   it('does not render protected content while authentication is checking', () => {

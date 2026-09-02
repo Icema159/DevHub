@@ -11,6 +11,7 @@ import {
   MAX_CONVERSATION_MESSAGE_LENGTH,
   normalizeConversationMessageContent,
   sendConversationMessage,
+  streamConversationMessage,
 } from './conversations.service';
 
 const conversation = {
@@ -89,6 +90,17 @@ function responseWith(data: unknown, status = 200): AxiosResponse<unknown> {
     headers: {},
     config: { headers: {} },
   } as AxiosResponse<unknown>;
+}
+
+function byteStream(chunks: string[]): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    start(controller) {
+      for (const chunk of chunks) controller.enqueue(encoder.encode(chunk));
+      controller.close();
+    },
+  });
 }
 
 afterEach(() => {
@@ -500,6 +512,67 @@ describe('Conversations service', () => {
     vi.spyOn(apiClient, 'post').mockRejectedValue(error);
 
     await expect(sendConversationMessage('conversation-id', 'Question')).rejects.toBe(error);
+  });
+
+  it('streams progressive events and returns only the validated final persisted turn', async () => {
+    const stream = byteStream([
+      'event: status\ndata: {"type":"status","phase":"retrieving"}\n\nevent: delta\nda',
+      'ta: {"type":"delta","delta":"Use an "}\n\nevent: delta\ndata: {"type":"delta","delta":"HttpOnly cookie [S1]."}\n\n',
+      `event: completed\ndata: ${JSON.stringify({ type: 'completed', result: messageResponse.data })}\n\n`,
+    ]);
+    const post = vi.spyOn(apiClient, 'post').mockResolvedValue(responseWith(stream, 200));
+    const onEvent = vi.fn();
+    const controller = new AbortController();
+
+    const result = await streamConversationMessage('conversation/id', 'Question', {
+      onEvent,
+      signal: controller.signal,
+    });
+
+    expect(post).toHaveBeenCalledWith(
+      '/api/conversations/conversation%2Fid/messages/stream',
+      { content: 'Question' },
+      expect.objectContaining({
+        adapter: 'fetch',
+        responseType: 'stream',
+        signal: controller.signal,
+        timeout: 0,
+      }),
+    );
+    expect(onEvent.mock.calls.map(([event]) => event.type)).toEqual([
+      'status',
+      'delta',
+      'delta',
+      'completed',
+    ]);
+    expect(result.message.content).toBe('Use an HttpOnly cookie [S1].');
+    expect(result.sources[0]?.label).toBe('S1');
+  });
+
+  it('rejects a safe server stream error without accepting partial output as completion', async () => {
+    const stream = byteStream([
+      'event: delta\ndata: {"type":"delta","delta":"Partial"}\n\n',
+      'event: error\ndata: {"code":"AI_PROVIDER_UNAVAILABLE","message":"Answer generation is temporarily unavailable","status":503}\n\n',
+    ]);
+    vi.spyOn(apiClient, 'post').mockResolvedValue(responseWith(stream, 200));
+
+    await expect(
+      streamConversationMessage('conversation-id', 'Question', { onEvent: vi.fn() }),
+    ).rejects.toMatchObject({
+      code: 'AI_PROVIDER_UNAVAILABLE',
+      kind: 'server',
+      status: 503,
+    });
+  });
+
+  it('rejects a malformed or truncated stream that has no completion event', async () => {
+    vi.spyOn(apiClient, 'post').mockResolvedValue(
+      responseWith(byteStream(['event: delta\ndata: {"type":"delta","delta":"Partial"}\n\n']), 200),
+    );
+
+    await expect(
+      streamConversationMessage('conversation-id', 'Question', { onEvent: vi.fn() }),
+    ).rejects.toMatchObject({ code: 'INVALID_API_RESPONSE' });
   });
 
   it('matches backend trimming, whitespace, and 4,000-character validation', () => {

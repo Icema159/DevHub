@@ -10,15 +10,22 @@ export interface AppSidebarProps {
   onNavigate?: () => void;
   onLogout?: () => void;
   user: ShellUser;
+  showProductCaption?: boolean;
 }
 
 const navigationItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard' },
+  { icon: LayoutDashboard, label: 'Overview', to: '/dashboard' },
   { icon: FileText, label: 'Documents', to: '/documents' },
-  { icon: MessagesSquare, label: 'Chat', to: '/chat' },
+  { icon: MessagesSquare, label: 'Threads', to: '/chat' },
 ] as const;
 
-export function AppSidebar({ isLoggingOut = false, onLogout, onNavigate, user }: AppSidebarProps) {
+export function AppSidebar({
+  isLoggingOut = false,
+  onLogout,
+  onNavigate,
+  showProductCaption = false,
+  user,
+}: AppSidebarProps) {
   const displayName = user.name?.trim() || user.email;
 
   const handleLogout = () => {
@@ -28,15 +35,19 @@ export function AppSidebar({ isLoggingOut = false, onLogout, onNavigate, user }:
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <Brand />
+      <Brand {...(showProductCaption ? { subtitle: 'Developer workspace' } : {})} />
       <nav className="mt-10 grid gap-2" aria-label="Primary navigation">
-        {navigationItems.map((item) => (
-          <SidebarNavItem
-            key={item.to}
-            {...item}
-            {...(onNavigate === undefined ? {} : { onNavigate })}
-          />
-        ))}
+        {navigationItems.map((item) => {
+          return (
+            <SidebarNavItem
+              key={item.to}
+              icon={item.icon}
+              label={item.label}
+              to={item.to}
+              {...(onNavigate === undefined ? {} : { onNavigate })}
+            />
+          );
+        })}
       </nav>
       <div className="mt-auto border-t border-border/80 pt-5">
         <div className="flex min-w-0 items-center gap-3 rounded-control px-2 py-2">

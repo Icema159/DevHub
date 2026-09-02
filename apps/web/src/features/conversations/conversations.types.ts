@@ -4,6 +4,7 @@ import type { ApiClientError } from '../../lib/api-client';
 import type {
   conversationDetailResponseSchema,
   conversationMessageCreateResponseSchema,
+  conversationMessageStreamEventSchema,
   conversationMessageSchema,
   conversationPaginationSchema,
   conversationRecordSchema,
@@ -21,6 +22,7 @@ export type PublicConversationSource = z.infer<typeof conversationSourceSchema>;
 export type ConversationTurnResult = z.infer<
   typeof conversationMessageCreateResponseSchema
 >['data'];
+export type ConversationMessageStreamEvent = z.infer<typeof conversationMessageStreamEventSchema>;
 export type ConversationPagination = z.infer<typeof conversationPaginationSchema>;
 
 export interface ConversationListResult {

@@ -21,6 +21,7 @@ const readyDocument: PublicDocumentDetails = {
   mimeType: 'application/pdf',
   size: 1_887_436,
   status: 'ready',
+  processingState: 'READY',
   processingError: null,
   createdAt: '2026-07-29T08:00:00.000Z',
   updatedAt: '2026-07-29T08:05:00.000Z',

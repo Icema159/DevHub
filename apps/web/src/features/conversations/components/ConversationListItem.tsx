@@ -9,11 +9,22 @@ import type { PublicConversationSummary } from '../conversations.types';
 export interface ConversationListItemProps {
   conversation: PublicConversationSummary;
   page: number;
+  routeBasePath: string;
   selected: boolean;
+  useThreadTerminology?: boolean;
 }
 
-export function ConversationListItem({ conversation, page, selected }: ConversationListItemProps) {
-  const title = conversationDisplayTitle(conversation.title);
+export function ConversationListItem({
+  conversation,
+  page,
+  routeBasePath,
+  selected,
+  useThreadTerminology = false,
+}: ConversationListItemProps) {
+  const title = conversationDisplayTitle(
+    conversation.title,
+    useThreadTerminology ? 'New thread' : undefined,
+  );
   const preview = conversationDisplayPreview(conversation.preview);
   const absoluteDate = formatAbsoluteDate(conversation.updatedAt);
 
@@ -27,7 +38,7 @@ export function ConversationListItem({ conversation, page, selected }: Conversat
             : 'border-transparent hover:bg-white/55 hover:text-foreground',
         )}
         aria-current={selected ? 'page' : undefined}
-        to={`/chat/${encodeURIComponent(conversation.id)}?page=${page}`}
+        to={`${routeBasePath}/${encodeURIComponent(conversation.id)}?page=${page}`}
       >
         <span
           className={cn(

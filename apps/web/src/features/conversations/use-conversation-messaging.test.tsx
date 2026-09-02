@@ -5,6 +5,7 @@ import { ApiClientError } from '../../lib/api-client';
 import * as conversationsService from './conversations.service';
 import type {
   ConversationTurnResult,
+  ConversationMessageStreamEvent,
   PublicConversationDetail,
   PublicConversationMessage,
   SelectedConversationRefreshResult,
@@ -16,7 +17,7 @@ vi.mock('./conversations.service', async (importOriginal) => {
 
   return {
     ...original,
-    sendConversationMessage: vi.fn(),
+    streamConversationMessage: vi.fn(),
   };
 });
 
@@ -67,10 +68,63 @@ function deferred<T>() {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(conversationsService.sendConversationMessage).mockResolvedValue(turn);
+  vi.mocked(conversationsService.streamConversationMessage).mockResolvedValue(turn);
 });
 
 describe('useConversationMessaging', () => {
+  it('exposes immediate retrieval state and appends real stream deltas progressively', async () => {
+    const request = deferred<ConversationTurnResult>();
+    let emitEvent: ((event: ConversationMessageStreamEvent) => void) | undefined;
+    vi.mocked(conversationsService.streamConversationMessage).mockImplementation(
+      async (_conversationId, _content, options) => {
+        emitEvent = options.onEvent;
+        return request.promise;
+      },
+    );
+    const refreshConversation = vi
+      .fn()
+      .mockResolvedValue(
+        successfulRefresh([previousUserMessage, { ...turn.message, sources: [] }]),
+      );
+    const { result } = renderHook(() =>
+      useConversationMessaging({
+        conversationId: 'conversation-a',
+        messages: [previousUserMessage],
+        onConversationActivity: vi.fn(),
+        refreshConversation,
+      }),
+    );
+
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current.submit('Question');
+    });
+
+    expect(result.current.resource).toMatchObject({
+      pendingContent: 'Question',
+      phase: 'starting',
+      status: 'submitting',
+      streamedAnswer: '',
+    });
+
+    act(() => {
+      emitEvent?.({ type: 'status', phase: 'generating' });
+      emitEvent?.({ type: 'delta', delta: 'First ' });
+      emitEvent?.({ type: 'delta', delta: 'tokens' });
+    });
+
+    expect(result.current.resource).toMatchObject({
+      phase: 'generating',
+      status: 'submitting',
+      streamedAnswer: 'First tokens',
+    });
+
+    await act(async () => {
+      request.resolve(turn);
+      await pending;
+    });
+  });
+
   it('submits once, reloads authoritative messages, and announces conversation activity', async () => {
     const onConversationActivity = vi.fn();
     const refreshConversation = vi.fn().mockResolvedValue(
@@ -100,9 +154,10 @@ describe('useConversationMessaging', () => {
       outcome = await result.current.submit('  Where should I store it?  ');
     });
 
-    expect(conversationsService.sendConversationMessage).toHaveBeenCalledWith(
+    expect(conversationsService.streamConversationMessage).toHaveBeenCalledWith(
       'conversation-a',
       'Where should I store it?',
+      expect.objectContaining({ signal: expect.any(AbortSignal), onEvent: expect.any(Function) }),
     );
     expect(refreshConversation).toHaveBeenCalledOnce();
     expect(onConversationActivity).toHaveBeenCalledOnce();
@@ -115,7 +170,7 @@ describe('useConversationMessaging', () => {
 
   it('deduplicates repeated sends while one state-changing request is active', async () => {
     const request = deferred<ConversationTurnResult>();
-    vi.mocked(conversationsService.sendConversationMessage).mockReturnValue(request.promise);
+    vi.mocked(conversationsService.streamConversationMessage).mockReturnValue(request.promise);
     const refreshConversation = vi
       .fn()
       .mockResolvedValue(
@@ -138,7 +193,7 @@ describe('useConversationMessaging', () => {
     });
 
     expect(first).toBe(second);
-    expect(conversationsService.sendConversationMessage).toHaveBeenCalledOnce();
+    expect(conversationsService.streamConversationMessage).toHaveBeenCalledOnce();
     expect(result.current.isSubmittingCurrent).toBe(true);
 
     await act(async () => {
@@ -151,7 +206,7 @@ describe('useConversationMessaging', () => {
   });
 
   it('preserves the draft outcome when backend compensation removed a failed USER message', async () => {
-    vi.mocked(conversationsService.sendConversationMessage).mockRejectedValue(
+    vi.mocked(conversationsService.streamConversationMessage).mockRejectedValue(
       new ApiClientError({
         code: 'AI_PROVIDER_UNAVAILABLE',
         kind: 'server',
@@ -185,7 +240,7 @@ describe('useConversationMessaging', () => {
   });
 
   it('clears a matching draft only after authoritative refresh confirms partial USER persistence', async () => {
-    vi.mocked(conversationsService.sendConversationMessage).mockRejectedValue(
+    vi.mocked(conversationsService.streamConversationMessage).mockRejectedValue(
       new ApiClientError({
         code: 'MESSAGE_PERSISTENCE_FAILED',
         kind: 'server',
@@ -227,7 +282,7 @@ describe('useConversationMessaging', () => {
   });
 
   it('recovers a complete persisted turn after an ambiguous response failure without resending', async () => {
-    vi.mocked(conversationsService.sendConversationMessage).mockRejectedValue(
+    vi.mocked(conversationsService.streamConversationMessage).mockRejectedValue(
       new ApiClientError({
         code: 'INVALID_API_RESPONSE',
         kind: 'unexpected',
@@ -262,7 +317,7 @@ describe('useConversationMessaging', () => {
     });
 
     expect(outcome).toEqual({ clearDraft: true, status: 'success' });
-    expect(conversationsService.sendConversationMessage).toHaveBeenCalledOnce();
+    expect(conversationsService.streamConversationMessage).toHaveBeenCalledOnce();
     expect(refreshConversation).toHaveBeenCalledOnce();
     expect(onConversationActivity).toHaveBeenCalledOnce();
     expect(result.current.resource).toMatchObject({
@@ -286,14 +341,14 @@ describe('useConversationMessaging', () => {
       await result.current.submit(' \n\t ');
     });
 
-    expect(conversationsService.sendConversationMessage).not.toHaveBeenCalled();
+    expect(conversationsService.streamConversationMessage).not.toHaveBeenCalled();
     expect(refreshConversation).not.toHaveBeenCalled();
     expect(result.current.resource).toMatchObject({ status: 'error' });
   });
 
   it('does not apply conversation A completion after navigation to conversation B', async () => {
     const request = deferred<ConversationTurnResult>();
-    vi.mocked(conversationsService.sendConversationMessage).mockReturnValue(request.promise);
+    vi.mocked(conversationsService.streamConversationMessage).mockReturnValue(request.promise);
     const refreshConversation = vi.fn();
     const onConversationActivity = vi.fn();
     const { result, rerender } = renderHook(
@@ -324,9 +379,9 @@ describe('useConversationMessaging', () => {
     expect(result.current.isBusy).toBe(false);
   });
 
-  it('does not abort or update state after unmount while a send is finishing', async () => {
+  it('aborts the stream and does not update state after unmount', async () => {
     const request = deferred<ConversationTurnResult>();
-    vi.mocked(conversationsService.sendConversationMessage).mockReturnValue(request.promise);
+    vi.mocked(conversationsService.streamConversationMessage).mockReturnValue(request.promise);
     const refreshConversation = vi.fn();
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { result, unmount } = renderHook(() =>
@@ -343,6 +398,10 @@ describe('useConversationMessaging', () => {
       pending = result.current.submit('Question');
     });
     unmount();
+
+    const streamOptions = vi.mocked(conversationsService.streamConversationMessage).mock
+      .calls[0]?.[2];
+    expect(streamOptions?.signal?.aborted).toBe(true);
 
     await act(async () => {
       request.resolve(turn);

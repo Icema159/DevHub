@@ -9,7 +9,7 @@ export interface DocumentManagementCardProps {
 
 export function DocumentManagementCard({ disabled, onDelete }: DocumentManagementCardProps) {
   return (
-    <Card className="document-details-decision-surface p-0" variant="solid">
+    <Card className="document-details-remove-surface p-0" variant="solid">
       <section
         className="flex flex-col gap-4 p-5 sm:p-6"
         aria-labelledby="document-management-heading"
@@ -19,15 +19,16 @@ export function DocumentManagementCard({ disabled, onDelete }: DocumentManagemen
             id="document-management-heading"
             className="type-heading-3 font-semibold text-foreground"
           >
-            Document management
+            Remove
           </h2>
           <p className="mt-1 type-body text-muted">
-            Remove this document from your knowledge base.
+            Removing this document deletes it and its processed data from your knowledge base. It
+            will no longer be used to answer new questions.
           </p>
         </div>
 
         <Button
-          className="w-full shrink-0"
+          className="document-details-remove-button w-full shrink-0"
           disabled={disabled}
           onClick={onDelete}
           variant="destructive"

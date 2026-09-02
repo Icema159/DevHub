@@ -81,20 +81,24 @@ export function ChatPage() {
   const creation = useCreateConversation({ onCreated: handleCreated });
   const selectedTitle = useMemo(() => {
     if (selectedConversation.resource.status !== 'success') {
-      return 'Chat';
+      return 'Threads';
     }
 
-    return conversationDisplayTitle(selectedConversation.resource.data.title);
+    return conversationDisplayTitle(selectedConversation.resource.data.title, 'New thread');
   }, [selectedConversation.resource]);
 
   usePageTitle(selectedTitle);
 
   return (
     <div className="min-w-0">
-      <h1 className="sr-only">Chat</h1>
+      <header className="chat-dark-v4-page-heading">
+        <h1>Threads</h1>
+        <p>Your questions, answered with sources.</p>
+      </header>
 
       <ConversationsWorkspace
         createError={creation.resource.status === 'error' ? creation.resource.error.message : null}
+        enableCitationInteraction
         isCreating={creation.isCreating}
         isMessageBusy={messaging.isBusy}
         isSubmittingMessage={messaging.isSubmittingCurrent}
@@ -107,8 +111,10 @@ export function ChatPage() {
         onListRetry={() => void conversations.refresh()}
         onSelectedRetry={() => void selectedConversation.refresh()}
         onSendMessage={messaging.submit}
+        routeBasePath="/chat"
         selectedResource={selectedConversation.resource}
         submissionResource={messaging.resource}
+        useThreadTerminology
         {...(conversationId ? { selectedConversationId: conversationId } : {})}
       />
     </div>

@@ -33,6 +33,7 @@ const readyDocument: PublicDocumentDetails = {
   mimeType: 'application/pdf',
   size: 1_887_436,
   status: 'ready',
+  processingState: 'READY',
   processingError: null,
   createdAt: '2026-07-29T08:00:00.000Z',
   updatedAt: '2026-07-29T08:05:00.000Z',
@@ -42,6 +43,7 @@ const readyDocument: PublicDocumentDetails = {
 const failedDocument: PublicDocumentDetails = {
   ...readyDocument,
   status: 'failed',
+  processingState: 'FAILED',
   processingError: 'Document embedding generation failed',
   processedAt: null,
 };
@@ -49,6 +51,7 @@ const failedDocument: PublicDocumentDetails = {
 const processingDocument: PublicDocumentDetails = {
   ...readyDocument,
   status: 'processing',
+  processingState: 'PROCESSING',
   processingError: null,
   processedAt: null,
   updatedAt: '2026-07-29T09:45:00.000Z',
@@ -127,25 +130,68 @@ describe('Document details page', () => {
     expect(document.title).toContain('Authentication Guide.pdf');
   });
 
-  it('shows only factual Ready-state availability copy', () => {
+  it('lets the pipeline itself convey Ready availability, without a redundant banner', () => {
     renderPage();
 
-    expect(screen.getByText('Ready for AI search')).toBeInTheDocument();
+    expect(screen.getByText('Ready for search')).toBeInTheDocument();
+    expect(screen.queryByText('Ready for AI search')).not.toBeInTheDocument();
     expect(
-      screen.getByText('This document can now be used for AI search and grounded answers.'),
-    ).toBeInTheDocument();
+      screen.queryByText('This document can now be used for AI search and grounded answers.'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Ask/i })).not.toBeInTheDocument();
   });
 
   it('places lifecycle context before dense metadata in reading order', () => {
     renderPage();
 
-    const statusHeading = screen.getByRole('heading', { name: 'Processing status' });
-    const informationHeading = screen.getByRole('heading', { name: 'Document information' });
+    const statusHeading = screen.getByRole('heading', { name: 'Pipeline' });
+    const informationHeading = screen.getByRole('heading', { name: 'Details' });
 
     expect(
       statusHeading.compareDocumentPosition(informationHeading) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it('renders the pipeline with only backend-tracked timestamps, no invented per-step data', () => {
+    renderPage();
+
+    expect(screen.getByText('Uploaded')).toBeInTheDocument();
+    expect(screen.getByText('Ready for search')).toBeInTheDocument();
+    // Real timestamps only exist for Uploaded (createdAt) and Ready (processedAt).
+    expect(screen.getAllByText(/Jul 29, 2026/).length).toBeGreaterThanOrEqual(2);
+    // The backend cannot distinguish an exact parse-vs-chunk boundary or expose page
+    // counts, fragment counts, or vector dimensions — none of that may appear anywhere.
+    expect(
+      screen.queryByText(/pages of text extracted|fragments|vectors|dims/i),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows honest in-progress pipeline steps for intermediate backend states, without a leaked technical state name', () => {
+    mockDetails(
+      success({
+        ...readyDocument,
+        status: 'processing',
+        processingState: 'EMBEDDING',
+        processedAt: null,
+      }),
+    );
+    renderPage();
+
+    expect(screen.getByText('Parsed')).toBeInTheDocument();
+    expect(screen.getByText('Chunked')).toBeInTheDocument();
+    expect(screen.getByText('Embedded')).toBeInTheDocument();
+    expect(screen.getAllByText('Completed').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText('In progress')).toBeInTheDocument();
+  });
+
+  it('marks only Uploaded as certain and avoids guessing the failed stage', () => {
+    mockDetails(success(failedDocument));
+    renderPage();
+
+    expect(screen.getByText('Processing stopped')).toBeInTheDocument();
+    expect(screen.queryByText('Parsed')).not.toBeInTheDocument();
+    expect(screen.queryByText('Chunked')).not.toBeInTheDocument();
+    expect(screen.queryByText('Embedded')).not.toBeInTheDocument();
   });
 
   it('groups active backend states into the public Processing presentation', () => {
@@ -537,6 +583,8 @@ describe('Document details page', () => {
         success({
           ...readyDocument,
           status,
+          processingState:
+            status === 'ready' ? 'READY' : status === 'failed' ? 'FAILED' : 'PROCESSING',
           processingError: status === 'failed' ? 'Safe processing issue' : null,
           processedAt: status === 'ready' ? readyDocument.processedAt : null,
         }),

@@ -9,6 +9,34 @@ import { AmbientLightLayer } from './AmbientLightLayer';
 import { AppSidebar } from './AppSidebar';
 import { Brand } from './Brand';
 
+/**
+ * Normalizes a pathname into a stable key that only changes when the user
+ * moves between meaningfully different pages (Overview / Documents /
+ * Document details / Threads). Dynamic ids (a specific document, a specific
+ * conversation) are collapsed so switching between two documents or two
+ * conversations does not retrigger the shared route transition — only
+ * navigating between page *kinds* does.
+ */
+function getPageTransitionKey(pathname: string): string {
+  if (pathname === '/dashboard') {
+    return 'dashboard';
+  }
+
+  if (/^\/documents\/[^/]+\/?$/.test(pathname)) {
+    return 'document-details';
+  }
+
+  if (/^\/documents(?:\/)?$/.test(pathname)) {
+    return 'documents';
+  }
+
+  if (/^\/chat(?:\/|$)/.test(pathname)) {
+    return 'chat';
+  }
+
+  return pathname;
+}
+
 export interface AppShellProps {
   accountNotice?: ReactNode;
   isLoggingOut?: boolean;
@@ -22,6 +50,7 @@ export function AppShell({ accountNotice, isLoggingOut = false, onLogout, user }
   const isDashboardRoute = location.pathname === '/dashboard';
   const isDocumentsRoute = /^\/documents(?:\/|$)/.test(location.pathname);
   const usesLivingGlassIdentity = isChatRoute || isDashboardRoute || isDocumentsRoute;
+  const pageTransitionKey = getPageTransitionKey(location.pathname);
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -67,9 +96,9 @@ export function AppShell({ accountNotice, isLoggingOut = false, onLogout, user }
       className={cn(
         'app-canvas relative isolate min-h-dvh overflow-x-hidden',
         usesLivingGlassIdentity && 'living-glass-identity',
-        isChatRoute && 'chat-identity',
-        isDashboardRoute && 'dashboard-identity',
-        isDocumentsRoute && 'documents-identity',
+        isChatRoute && 'chat-identity chat-dark-v4-identity',
+        isDashboardRoute && 'overview-identity overview-v4-identity',
+        isDocumentsRoute && 'documents-identity overview-v4-identity documents-v4-identity',
       )}
     >
       <a
@@ -81,8 +110,13 @@ export function AppShell({ accountNotice, isLoggingOut = false, onLogout, user }
 
       {usesLivingGlassIdentity ? <AmbientLightLayer /> : null}
 
-      <aside className="material-navigation elevation-1 fixed inset-y-3 left-3 z-30 hidden w-[17rem] overflow-hidden rounded-glass border p-5 lg:block">
-        <AppSidebar isLoggingOut={isLoggingOut} user={user} {...(onLogout ? { onLogout } : {})} />
+      <aside className="app-sidebar-shell material-navigation elevation-1 fixed inset-y-3 left-3 z-30 hidden w-[17rem] overflow-hidden rounded-glass border p-5 lg:block">
+        <AppSidebar
+          isLoggingOut={isLoggingOut}
+          showProductCaption={isChatRoute || isDashboardRoute || isDocumentsRoute}
+          user={user}
+          {...(onLogout ? { onLogout } : {})}
+        />
       </aside>
 
       <header className="material-workspace elevation-0 sticky top-0 z-20 flex min-h-16 items-center justify-between border-x-0 border-t-0 border-b px-4 lg:hidden">
@@ -127,6 +161,7 @@ export function AppShell({ accountNotice, isLoggingOut = false, onLogout, user }
             isLoggingOut={isLoggingOut}
             user={user}
             onNavigate={closeMobileNavigation}
+            showProductCaption={isChatRoute || isDashboardRoute || isDocumentsRoute}
             {...(onLogout ? { onLogout } : {})}
           />
         </div>
@@ -134,11 +169,13 @@ export function AppShell({ accountNotice, isLoggingOut = false, onLogout, user }
 
       <main
         id="main-content"
-        className="relative z-10 min-w-0 px-4 py-6 sm:px-6 sm:py-8 lg:ml-[18.5rem] lg:px-8 lg:py-10"
+        className="app-shell-main relative z-10 min-w-0 px-4 py-6 sm:px-6 sm:py-8 lg:ml-[18.5rem] lg:px-8 lg:py-10"
       >
-        <div className="mx-auto w-full max-w-[90rem]">
+        <div className="app-shell-content mx-auto w-full max-w-[90rem]">
           {accountNotice ? <div className="mb-6">{accountNotice}</div> : null}
-          <Outlet />
+          <div key={pageTransitionKey} className="route-transition-content">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>

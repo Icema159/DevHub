@@ -38,11 +38,11 @@ export function AttentionDocuments({ className, onRetry, resource }: AttentionDo
       ) : null}
 
       {resource.status === 'success' && resource.data.documents.length === 0 ? (
-        <div className="flex items-start gap-3 rounded-card border border-success/15 bg-success-soft/55 p-4 text-green-950">
+        <div className="overview-attention-calm flex items-start gap-3 rounded-card border border-success/15 bg-success-soft/55 p-4">
           <CircleCheck className="mt-0.5 size-5 shrink-0 text-success" aria-hidden="true" />
           <div>
             <h3 className="type-body font-semibold">All documents are on track</h3>
-            <p className="mt-1 type-body text-green-950/75">
+            <p className="mt-1 type-body text-muted">
               No documents currently require your attention.
             </p>
           </div>
@@ -50,13 +50,13 @@ export function AttentionDocuments({ className, onRetry, resource }: AttentionDo
       ) : null}
 
       {hasFailedDocuments ? (
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+        <ul className="grid gap-2 sm:grid-cols-2">
           {resource.data.documents.map((document) => (
             <li
               key={document.id}
-              className="flex min-w-0 items-start gap-3 rounded-card border border-danger/10 bg-danger-soft/35 p-4"
+              className="overview-attention-row flex min-w-0 items-start gap-3 rounded-card border border-danger/10 bg-danger-soft/35 p-4"
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-white/75 text-danger">
+              <span className="overview-attention-icon flex size-10 shrink-0 items-center justify-center rounded-control text-danger">
                 <FileWarning className="size-5" aria-hidden="true" />
               </span>
               <span className="min-w-0 flex-1">

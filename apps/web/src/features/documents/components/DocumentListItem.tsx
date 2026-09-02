@@ -1,4 +1,3 @@
-import { FileText } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { StatusBadge } from '../../../components/ui';
@@ -8,13 +7,17 @@ import type { PublicDocument } from '../documents.types';
 
 export interface DocumentListItemProps {
   document: PublicDocument;
+  ordinal: number;
 }
 
-export function DocumentListItem({ document }: DocumentListItemProps) {
+export function DocumentListItem({ document, ordinal }: DocumentListItemProps) {
   return (
-    <li className="group grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-2 border-t border-border/80 px-4 py-3 first:border-t-0 transition-colors first-of-type:border-t-0 hover:bg-primary-soft/24 focus-within:bg-primary-soft/32 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center xl:grid-cols-[auto_minmax(14rem,1fr)_9rem_7rem_10rem] xl:px-5">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-danger-soft/65 text-danger">
-        <FileText className="size-5" aria-hidden="true" />
+    <li className="documents-v4-row group grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)] items-start gap-x-3 gap-y-2 border-t border-border/80 px-4 py-3 first:border-t-0 transition-colors first-of-type:border-t-0 hover:bg-primary-soft/24 focus-within:bg-primary-soft/32 sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-center xl:grid-cols-[3.5rem_minmax(14rem,1fr)_7rem_10rem_7rem] xl:px-5">
+      <span
+        className="documents-v4-ordinal self-center font-mono type-small text-muted"
+        aria-hidden="true"
+      >
+        {String(ordinal).padStart(3, '0')}
       </span>
 
       <span className="min-w-0">
@@ -38,16 +41,16 @@ export function DocumentListItem({ document }: DocumentListItemProps) {
       </span>
 
       <StatusBadge
-        className="col-start-2 justify-self-start sm:col-start-3 sm:row-start-1 sm:justify-self-end xl:col-start-3 xl:justify-self-start"
+        className="col-start-2 justify-self-start sm:col-start-3 sm:row-start-1 sm:justify-self-end xl:col-start-5 xl:justify-self-start"
         status={document.status}
       />
 
-      <span className="hidden type-body text-secondary xl:block">
+      <span className="hidden type-small text-secondary xl:col-start-3 xl:row-start-1 xl:block">
         {formatFileSize(document.size)}
       </span>
 
       <time
-        className="hidden type-small text-muted xl:block"
+        className="hidden type-small text-muted xl:col-start-4 xl:row-start-1 xl:block"
         dateTime={document.createdAt}
         title={formatAbsoluteDate(document.createdAt)}
       >

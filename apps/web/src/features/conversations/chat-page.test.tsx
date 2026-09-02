@@ -20,7 +20,7 @@ vi.mock('./conversations.service', async (importOriginal) => {
     createConversation: vi.fn(),
     getConversation: vi.fn(),
     listConversations: vi.fn(),
-    sendConversationMessage: vi.fn(),
+    streamConversationMessage: vi.fn(),
   };
 });
 
@@ -136,16 +136,16 @@ beforeEach(() => {
     title: conversationId === 'new-conversation' ? null : selectedConversation.title,
   }));
   vi.mocked(conversationsService.createConversation).mockResolvedValue(createdConversation);
-  vi.mocked(conversationsService.sendConversationMessage).mockResolvedValue(completedTurn);
+  vi.mocked(conversationsService.streamConversationMessage).mockResolvedValue(completedTurn);
 });
 
-describe('Chat page', () => {
+describe('Threads page', () => {
   it('replaces the placeholder with the real workspace without creating automatically', async () => {
     renderChat();
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Chat' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: 'Conversations' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: 'Conversation workspace' })).toHaveClass(
+    expect(screen.getByRole('heading', { level: 1, name: 'Threads' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Threads' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Thread workspace' })).toHaveClass(
       'material-workspace',
     );
     expect(screen.queryByText('Page shell is ready')).not.toBeInTheDocument();
@@ -160,11 +160,11 @@ describe('Chat page', () => {
 
   it('preserves backend order and renders stable nullable fallbacks', async () => {
     renderChat();
-    const navigation = await screen.findByRole('navigation', { name: 'Conversations' });
+    const navigation = await screen.findByRole('navigation', { name: 'Threads' });
     const links = within(navigation).getAllByRole('link');
 
     expect(links[0]).toHaveTextContent('JWT Authentication');
-    expect(links[1]).toHaveTextContent('New conversation');
+    expect(links[1]).toHaveTextContent('New thread');
     expect(links[1]).toHaveTextContent('No messages yet');
   });
 
@@ -187,11 +187,92 @@ describe('Chat page', () => {
     expect(screen.getByRole('link', { name: /JWT Authentication/ })).toHaveClass(
       'material-selected',
     );
-    expect(screen.getByRole('link', { name: 'Back to conversations' })).toHaveClass('xl:hidden');
+    expect(screen.getByRole('link', { name: 'Back to threads' })).toHaveClass('xl:hidden');
     expect(conversationsService.getConversation).toHaveBeenCalledWith(
       'jwt-conversation',
       expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
+  });
+
+  it('keeps list, create, and back navigation inside the production Threads route', async () => {
+    const user = userEvent.setup();
+    renderChat();
+
+    expect(screen.getByRole('region', { name: 'Threads' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Thread workspace' })).toBeInTheDocument();
+    expect(screen.queryByText('Conversations')).not.toBeInTheDocument();
+    expect(screen.queryByText('Your recent knowledge conversations.')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Enter to send/)).not.toBeInTheDocument();
+
+    const conversationLink = await screen.findByRole('link', { name: /JWT Authentication/ });
+    expect(conversationLink).toHaveAttribute('href', '/chat/jwt-conversation?page=1');
+
+    await user.click(conversationLink);
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current location')).toHaveTextContent(
+        '/chat/jwt-conversation?page=1',
+      ),
+    );
+    expect(screen.getByRole('link', { name: 'Back to threads' })).toHaveAttribute(
+      'href',
+      '/chat?page=1',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'New thread' }));
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current location')).toHaveTextContent(
+        '/chat/created-conversation?page=1',
+      ),
+    );
+  });
+
+  it('omits the one-page thread count while preserving meaningful pagination behavior', async () => {
+    vi.mocked(conversationsService.listConversations).mockResolvedValue({
+      ...conversationSummaries,
+      meta: { page: 1, limit: 20, total: 2, totalPages: 1 },
+    });
+
+    renderChat();
+
+    await screen.findByRole('navigation', { name: 'Threads' });
+    expect(screen.queryByText('2 conversations')).not.toBeInTheDocument();
+    expect(screen.queryByText('2 threads')).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: 'Pagination' })).not.toBeInTheDocument();
+  });
+
+  it('connects inline citation markers to their source receipts', async () => {
+    vi.mocked(conversationsService.getConversation).mockResolvedValue({
+      ...selectedConversation,
+      messages: [
+        {
+          id: 'assistant-with-source',
+          role: 'ASSISTANT',
+          content: 'Use the documented cookie flow [S1].',
+          createdAt: '2026-07-29T08:02:00.000Z',
+          sources: [
+            {
+              label: 'S1',
+              documentId: 'authentication-guide',
+              documentName: 'Authentication Guide.pdf',
+              chunkId: 'authentication-chunk',
+              chunkPosition: 1,
+              page: 12,
+            },
+          ],
+        },
+      ],
+    });
+
+    renderChat('/chat/jwt-conversation');
+    expect(await screen.findByText(/documented cookie flow/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Show source S1' })).toHaveClass(
+      'chat-inline-citation',
+    );
+    const source = screen.getByRole('link', {
+      name: 'Source [S1]: Authentication Guide.pdf, page 12',
+    });
+    expect(source).toHaveClass('chat-citation-receipt');
+    expect(source).toHaveAttribute('href', '/documents/authentication-guide');
   });
 
   it('loads a direct-linked conversation even when it is absent from the current list page', async () => {
@@ -236,7 +317,7 @@ describe('Chat page', () => {
 
   it('sends one new question, reloads authoritative messages, and refreshes page one', async () => {
     const user = userEvent.setup();
-    vi.mocked(conversationsService.sendConversationMessage).mockResolvedValueOnce({
+    vi.mocked(conversationsService.streamConversationMessage).mockResolvedValueOnce({
       ...completedTurn,
       sources: [
         {
@@ -286,9 +367,10 @@ describe('Chat page', () => {
     await user.type(textarea, 'Where should I store it?{Enter}');
 
     await waitFor(() =>
-      expect(conversationsService.sendConversationMessage).toHaveBeenCalledWith(
+      expect(conversationsService.streamConversationMessage).toHaveBeenCalledWith(
         'jwt-conversation',
         'Where should I store it?',
+        expect.objectContaining({ signal: expect.any(AbortSignal), onEvent: expect.any(Function) }),
       ),
     );
     expect(await screen.findByText('Use an HttpOnly cookie.')).toBeInTheDocument();
@@ -316,7 +398,7 @@ describe('Chat page', () => {
 
   it('keeps the draft and shows no fake ASSISTANT message after a compensated AI failure', async () => {
     const user = userEvent.setup();
-    vi.mocked(conversationsService.sendConversationMessage).mockRejectedValue(
+    vi.mocked(conversationsService.streamConversationMessage).mockRejectedValue(
       new ApiClientError({
         code: 'AI_PROVIDER_UNAVAILABLE',
         kind: 'server',
@@ -338,7 +420,7 @@ describe('Chat page', () => {
     );
     expect(textarea).toHaveValue('Question that should be retried');
     expect(screen.getAllByRole('article')).toHaveLength(1);
-    expect(conversationsService.sendConversationMessage).toHaveBeenCalledOnce();
+    expect(conversationsService.streamConversationMessage).toHaveBeenCalledOnce();
   });
 
   it('creates exactly once, preserves the server ID, navigates, and refreshes page one', async () => {
@@ -351,9 +433,9 @@ describe('Chat page', () => {
       messages: [],
     });
     renderChat('/chat?page=2');
-    await screen.findByRole('heading', { level: 2, name: 'Conversations' });
+    await screen.findByRole('region', { name: 'Threads' });
 
-    const createButton = screen.getByRole('button', { name: 'New conversation' });
+    const createButton = screen.getByRole('button', { name: 'New thread' });
     await user.dblClick(createButton);
 
     expect(conversationsService.createConversation).toHaveBeenCalledOnce();
@@ -365,7 +447,7 @@ describe('Chat page', () => {
       ),
     );
     expect(
-      await screen.findByRole('heading', { level: 2, name: 'New conversation' }),
+      await screen.findByRole('heading', { level: 2, name: 'New thread' }),
     ).toBeInTheDocument();
     expect(conversationsService.listConversations).toHaveBeenLastCalledWith(
       { page: 1, limit: 20 },
@@ -387,12 +469,12 @@ describe('Chat page', () => {
     renderChat('/chat/jwt-conversation');
     await screen.findByRole('heading', { level: 2, name: 'JWT Authentication' });
 
-    await user.click(screen.getByRole('button', { name: 'New conversation' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Conversation could not be created');
+    await user.click(screen.getByRole('button', { name: 'New thread' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Thread could not be created');
     expect(screen.getByLabelText('Current location')).toHaveTextContent('/chat/jwt-conversation');
     expect(screen.getByRole('link', { name: /JWT Authentication/ })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'New conversation' }));
+    await user.click(screen.getByRole('button', { name: 'New thread' }));
     await waitFor(() => expect(conversationsService.createConversation).toHaveBeenCalledTimes(2));
   });
 
@@ -408,10 +490,10 @@ describe('Chat page', () => {
     renderChat('/chat/foreign-conversation');
 
     expect(
-      await screen.findByText('This conversation could not be found or is no longer available.'),
+      await screen.findByText('This thread could not be found or is no longer available.'),
     ).toBeInTheDocument();
     expect(screen.queryByText(/owner|forbidden|another user/i)).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back to conversations' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Back to threads' })).toHaveAttribute(
       'href',
       '/chat?page=1',
     );
@@ -430,8 +512,8 @@ describe('Chat page', () => {
       .mockResolvedValueOnce(selectedConversation);
     renderChat('/chat/jwt-conversation');
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Conversation could not be loaded');
-    expect(screen.queryByText('Conversation unavailable')).not.toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Thread could not be loaded');
+    expect(screen.queryByText('Thread unavailable')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Retry' }));
     expect(
@@ -472,8 +554,8 @@ describe('Chat page', () => {
       meta: { page: 1, limit: 20, total: 0, totalPages: 0 },
     });
     const emptyPage = renderChat();
-    expect(await screen.findByText('No conversations yet')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'New conversation' })).toHaveLength(1);
+    expect(await screen.findByText('No threads yet')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'New thread' })).toHaveLength(1);
     emptyPage.unmount();
 
     vi.mocked(conversationsService.listConversations).mockRejectedValueOnce(
@@ -484,7 +566,7 @@ describe('Chat page', () => {
       }),
     );
     renderChat();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Conversations could not be loaded');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Threads could not be loaded');
     expect(screen.getByRole('button', { name: 'Retry' })).toBeEnabled();
   });
 

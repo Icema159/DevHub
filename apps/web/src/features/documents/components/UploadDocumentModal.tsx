@@ -139,7 +139,7 @@ export function UploadDocumentModal({
     >
       <div
         className={cn(
-          'rounded-card border-2 border-dashed p-5 text-center transition',
+          'document-upload-dropzone rounded-card border-2 border-dashed p-5 text-center transition',
           isDragging ? 'border-primary bg-primary-soft/80' : 'border-border-strong bg-slate-50/65',
           isUploading && 'opacity-60',
         )}
@@ -177,7 +177,7 @@ export function UploadDocumentModal({
         />
         <label
           className={cn(
-            'mt-4 inline-flex min-h-11 items-center justify-center rounded-control border border-border-strong bg-white px-4 type-body font-semibold text-foreground shadow-sm transition',
+            'document-upload-choose-button mt-4 inline-flex min-h-11 items-center justify-center rounded-control border border-border-strong bg-white px-4 type-body font-semibold text-foreground shadow-sm transition',
             'cursor-pointer hover:border-primary/30 hover:bg-primary-soft/60 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary',
             isUploading && 'pointer-events-none opacity-50',
           )}
@@ -188,8 +188,8 @@ export function UploadDocumentModal({
       </div>
 
       {selectedFile ? (
-        <div className="mt-4 flex min-w-0 items-center gap-3 rounded-control border border-border bg-white p-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-danger-soft/65 text-danger">
+        <div className="document-upload-file-preview mt-4 flex min-w-0 items-center gap-3 rounded-control border border-border bg-white p-3">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-primary-soft/65 text-primary">
             <FileText className="size-5" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">

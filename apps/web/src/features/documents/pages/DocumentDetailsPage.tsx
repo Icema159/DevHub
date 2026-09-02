@@ -37,7 +37,7 @@ function safePageTitle(resource: DocumentDetailsResource): string {
 function BackToDocumentsLink() {
   return (
     <Link
-      className="inline-flex min-h-11 items-center gap-2 rounded-control px-2 type-body font-semibold text-secondary transition hover:bg-white/70 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="document-details-back-link inline-flex min-h-11 items-center gap-2 rounded-control px-2 type-body font-semibold text-secondary transition hover:bg-white/70 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       to="/documents"
     >
       <ArrowLeft className="size-4" aria-hidden="true" />
@@ -106,7 +106,7 @@ export function DocumentDetailsPage() {
   usePageTitle(safePageTitle(resource));
 
   return (
-    <div className="document-details-v3 mx-auto min-w-0 max-w-[80rem] pb-12">
+    <div className="document-details-v4-page mx-auto min-w-0 max-w-[80rem] pb-12">
       <div className="-ml-2 mb-5">
         <BackToDocumentsLink />
       </div>

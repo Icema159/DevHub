@@ -117,6 +117,7 @@ function mapPublicDocumentDetails(
     mimeType: document.mimeType,
     size: document.size,
     status: mapDocumentStatus(document.processingState),
+    processingState: document.processingState,
     processingError: document.processingError,
     createdAt: document.createdAt,
     updatedAt: document.updatedAt,

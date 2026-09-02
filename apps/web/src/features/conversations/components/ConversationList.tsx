@@ -13,7 +13,9 @@ export interface ConversationListProps {
   onRetry: () => void;
   page: number;
   resource: ConversationListResource;
+  routeBasePath: string;
   selectedConversationId?: string;
+  useThreadTerminology?: boolean;
 }
 
 export function ConversationList({
@@ -24,40 +26,63 @@ export function ConversationList({
   onRetry,
   page,
   resource,
+  routeBasePath,
   selectedConversationId,
+  useThreadTerminology = false,
 }: ConversationListProps) {
+  const showFooter =
+    resource.status === 'success' &&
+    (!useThreadTerminology ||
+      resource.refreshError !== null ||
+      resource.data.meta.totalPages > 1 ||
+      resource.isRefreshing);
+
   return (
     <section
       className="material-workspace chat-conversation-rail elevation-1 flex h-full min-h-[36rem] min-w-0 flex-col overflow-hidden rounded-glass border"
-      aria-labelledby="conversations-heading"
+      {...(useThreadTerminology
+        ? { 'aria-label': 'Threads' }
+        : { 'aria-labelledby': 'conversations-heading' })}
       aria-busy={resource.status === 'loading' || undefined}
     >
       <div className="relative z-10 border-b border-border/70 bg-white/28 p-4 supports-[backdrop-filter]:backdrop-blur-sm sm:p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2
-              className="type-heading-2 font-semibold tracking-tight text-foreground"
-              id="conversations-heading"
-            >
-              Conversations
-            </h2>
-            <p className="mt-1 type-small text-muted">Your recent knowledge conversations.</p>
+        {!useThreadTerminology ? (
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2
+                className="type-heading-2 font-semibold tracking-tight text-foreground"
+                id="conversations-heading"
+              >
+                Conversations
+              </h2>
+              <p className="mt-1 type-small text-muted">Your recent knowledge conversations.</p>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <Button
-          className="chat-primary-cta mt-4 w-full"
+          className={
+            useThreadTerminology ? 'chat-primary-cta w-full' : 'chat-primary-cta mt-4 w-full'
+          }
           isLoading={isCreating}
           loadingLabel="Creating…"
           onClick={onCreate}
           size="small"
         >
           <Plus className="size-4" aria-hidden="true" />
-          New conversation
+          {useThreadTerminology ? 'New thread' : 'New conversation'}
         </Button>
 
         {createError ? (
-          <Alert className="mt-3" title="Conversation could not be created" variant="error">
+          <Alert
+            className="mt-3"
+            title={
+              useThreadTerminology
+                ? 'Thread could not be created'
+                : 'Conversation could not be created'
+            }
+            variant="error"
+          >
             {createError}
           </Alert>
         ) : null}
@@ -68,7 +93,14 @@ export function ConversationList({
 
         {resource.status === 'error' ? (
           <div className="p-4">
-            <Alert title="Conversations could not be loaded" variant="error">
+            <Alert
+              title={
+                useThreadTerminology
+                  ? 'Threads could not be loaded'
+                  : 'Conversations could not be loaded'
+              }
+              variant="error"
+            >
               <p>{resource.error.message}</p>
               <Button className="mt-4" onClick={onRetry} size="small" variant="secondary">
                 <RefreshCw className="size-4" aria-hidden="true" />
@@ -80,22 +112,31 @@ export function ConversationList({
 
         {resource.status === 'success' && resource.data.conversations.length === 0 ? (
           <EmptyState
-            className="m-4 py-8"
-            description="Create a conversation to start building your knowledge workspace."
+            className="chat-empty-state chat-v4-empty-card m-4 py-8"
+            description={
+              useThreadTerminology
+                ? 'Create a thread to start building your knowledge workspace.'
+                : 'Create a conversation to start building your knowledge workspace.'
+            }
             icon={<MessagesSquare className="size-6" aria-hidden="true" />}
-            title="No conversations yet"
+            title={useThreadTerminology ? 'No threads yet' : 'No conversations yet'}
           />
         ) : null}
 
         {resource.status === 'success' && resource.data.conversations.length > 0 ? (
-          <nav className="p-2 sm:p-3" aria-label="Conversations">
+          <nav
+            className="p-2 sm:p-3"
+            aria-label={useThreadTerminology ? 'Threads' : 'Conversations'}
+          >
             <ul className="grid gap-0.5">
               {resource.data.conversations.map((conversation) => (
                 <ConversationListItem
                   conversation={conversation}
                   key={conversation.id}
                   page={page}
+                  routeBasePath={routeBasePath}
                   selected={conversation.id === selectedConversationId}
+                  useThreadTerminology={useThreadTerminology}
                 />
               ))}
             </ul>
@@ -103,10 +144,18 @@ export function ConversationList({
         ) : null}
       </div>
 
-      {resource.status === 'success' ? (
+      {showFooter && resource.status === 'success' ? (
         <div className="relative z-10 border-t border-border/70 bg-white/24 p-3 supports-[backdrop-filter]:backdrop-blur-sm">
           {resource.refreshError ? (
-            <Alert className="mb-3" title="Could not refresh conversations" variant="error">
+            <Alert
+              className="mb-3"
+              title={
+                useThreadTerminology
+                  ? 'Could not refresh threads'
+                  : 'Could not refresh conversations'
+              }
+              variant="error"
+            >
               {resource.refreshError.message}
             </Alert>
           ) : null}
@@ -116,16 +165,16 @@ export function ConversationList({
               onPageChange={onPageChange}
               totalPages={resource.data.meta.totalPages}
             />
-          ) : (
+          ) : !useThreadTerminology ? (
             <p className="text-center type-caption text-muted">
               {resource.data.meta.total === 1
                 ? '1 conversation'
                 : `${resource.data.meta.total} conversations`}
             </p>
-          )}
+          ) : null}
           {resource.isRefreshing ? (
             <p className="sr-only" role="status">
-              Refreshing conversations
+              {useThreadTerminology ? 'Refreshing threads' : 'Refreshing conversations'}
             </p>
           ) : null}
         </div>

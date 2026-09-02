@@ -305,7 +305,7 @@ export function UiKitPage() {
 
         <section className={`${sectionClassName} xl:col-span-2`}>
           <SectionHeading description="Assistant copy remains grounded and citations lead to document details.">
-            Chat and citations
+            Threads and citations
           </SectionHeading>
           <div className="grid gap-4">
             <ChatMessage role="user">How does JWT authentication work?</ChatMessage>
@@ -438,9 +438,9 @@ export function UiKitPage() {
           </SectionHeading>
           <Card className="max-w-sm" variant="glass">
             <nav className="grid gap-2" aria-label="Sidebar component preview">
-              <SidebarNavItem active icon={LayoutDashboard} label="Dashboard" to="/dashboard" />
+              <SidebarNavItem active icon={LayoutDashboard} label="Overview" to="/dashboard" />
               <SidebarNavItem icon={FileText} label="Documents" to="/documents" />
-              <SidebarNavItem icon={MessagesSquare} label="Chat" to="/chat" />
+              <SidebarNavItem icon={MessagesSquare} label="Threads" to="/chat" />
             </nav>
           </Card>
         </section>

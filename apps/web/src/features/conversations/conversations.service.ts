@@ -4,9 +4,12 @@ import {
   conversationDetailResponseSchema,
   conversationListResponseSchema,
   conversationMessageCreateResponseSchema,
+  conversationMessageStreamErrorSchema,
+  conversationMessageStreamEventSchema,
 } from './conversations.schemas';
 import type {
   ConversationListResult,
+  ConversationMessageStreamEvent,
   ConversationTurnResult,
   PublicConversation,
   PublicConversationDetail,
@@ -22,6 +25,11 @@ export interface ConversationListParams {
 }
 
 export interface ConversationReadOptions {
+  signal?: AbortSignal;
+}
+
+export interface ConversationMessageStreamOptions {
+  onEvent: (event: ConversationMessageStreamEvent) => void;
   signal?: AbortSignal;
 }
 
@@ -136,4 +144,129 @@ export async function sendConversationMessage(
   }
 
   return parsed.data.data;
+}
+
+function isReadableByteStream(value: unknown): value is ReadableStream<Uint8Array> {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'getReader' in value &&
+    typeof value.getReader === 'function'
+  );
+}
+
+function streamErrorKind(status: number): ConstructorParameters<typeof ApiClientError>[0]['kind'] {
+  if (status === 401) return 'unauthenticated';
+  if (status === 403) return 'forbidden';
+  if (status === 429) return 'rate-limited';
+  if (status >= 500) return 'server';
+  return status === 400 ? 'validation' : 'unexpected';
+}
+
+function parseStreamBlock(
+  block: string,
+  onEvent: (event: ConversationMessageStreamEvent) => void,
+): ConversationTurnResult | null {
+  const eventName = block
+    .split('\n')
+    .find((line) => line.startsWith('event:'))
+    ?.slice('event:'.length)
+    .trim();
+  const data = block
+    .split('\n')
+    .filter((line) => line.startsWith('data:'))
+    .map((line) => line.slice('data:'.length).trimStart())
+    .join('\n');
+
+  if (!eventName || !data) {
+    throw invalidResponseError();
+  }
+
+  let decoded: unknown;
+
+  try {
+    decoded = JSON.parse(data);
+  } catch {
+    throw invalidResponseError();
+  }
+
+  if (eventName === 'error') {
+    const parsedError = conversationMessageStreamErrorSchema.safeParse(decoded);
+
+    if (!parsedError.success) {
+      throw invalidResponseError();
+    }
+
+    throw new ApiClientError({
+      code: parsedError.data.code,
+      kind: streamErrorKind(parsedError.data.status),
+      message: parsedError.data.message,
+      status: parsedError.data.status,
+    });
+  }
+
+  const parsedEvent = conversationMessageStreamEventSchema.safeParse(decoded);
+
+  if (!parsedEvent.success || parsedEvent.data.type !== eventName) {
+    throw invalidResponseError();
+  }
+
+  onEvent(parsedEvent.data);
+  return parsedEvent.data.type === 'completed' ? parsedEvent.data.result : null;
+}
+
+export async function streamConversationMessage(
+  conversationId: string,
+  content: string,
+  options: ConversationMessageStreamOptions,
+): Promise<ConversationTurnResult> {
+  const response = await apiClient.post<ReadableStream<Uint8Array>>(
+    `/api/conversations/${encodeURIComponent(conversationId)}/messages/stream`,
+    { content },
+    {
+      adapter: 'fetch',
+      responseType: 'stream',
+      timeout: 0,
+      ...(options.signal ? { signal: options.signal } : {}),
+    },
+  );
+
+  if (response.status !== 200 || !isReadableByteStream(response.data)) {
+    throw invalidResponseError();
+  }
+
+  const reader = response.data.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let result: ConversationTurnResult | null = null;
+
+  while (true) {
+    const read = await reader.read();
+    buffer += decoder.decode(read.value, { stream: !read.done }).replace(/\r\n/g, '\n');
+
+    let boundary = buffer.indexOf('\n\n');
+
+    while (boundary >= 0) {
+      const block = buffer.slice(0, boundary).trim();
+      buffer = buffer.slice(boundary + 2);
+
+      if (block) {
+        result = parseStreamBlock(block, options.onEvent) ?? result;
+      }
+
+      boundary = buffer.indexOf('\n\n');
+    }
+
+    if (read.done) break;
+  }
+
+  if (buffer.trim()) {
+    result = parseStreamBlock(buffer.trim(), options.onEvent) ?? result;
+  }
+
+  if (!result) {
+    throw invalidResponseError();
+  }
+
+  return result;
 }

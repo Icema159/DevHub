@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { resolveApiBaseUrl } from './api-base-url';
 
 describe('API base URL configuration', () => {
-  it('uses the local API origin during development', () => {
-    expect(resolveApiBaseUrl(undefined, false)).toBe('http://localhost:3000');
+  it('uses the same-origin dev proxy by default', () => {
+    expect(resolveApiBaseUrl(undefined, false)).toBe('/');
     expect(resolveApiBaseUrl('https://api.example.com', false)).toBe('https://api.example.com');
   });
 

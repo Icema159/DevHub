@@ -1,8 +1,11 @@
 export const CONVERSATION_TITLE_FALLBACK = 'New conversation';
 export const CONVERSATION_PREVIEW_FALLBACK = 'No messages yet';
 
-export function conversationDisplayTitle(title: string | null): string {
-  return title?.trim() || CONVERSATION_TITLE_FALLBACK;
+export function conversationDisplayTitle(
+  title: string | null,
+  fallback = CONVERSATION_TITLE_FALLBACK,
+): string {
+  return title?.trim() || fallback;
 }
 
 export function conversationDisplayPreview(preview: string | null): string {

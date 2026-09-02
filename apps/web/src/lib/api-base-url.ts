@@ -15,7 +15,10 @@ export function resolveApiBaseUrl(
   }
 
   if (!configuredUrl) {
-    return 'http://localhost:3000';
+    // Same-origin dev default: the Vite dev server proxies /api to the local
+    // API (see server.proxy in vite.config.ts), mirroring the production
+    // topology where a same-origin proxy sits in front of both.
+    return '/';
   }
 
   if (configuredUrl === '/') {

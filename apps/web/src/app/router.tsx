@@ -75,9 +75,11 @@ export function AppRoutes() {
         </Route>
       </Route>
 
-      <Route element={<AppShell user={uiKitPreviewUser} />}>
-        <Route path="/ui-kit" element={<UiKitPage />} />
-      </Route>
+      {import.meta.env.DEV ? (
+        <Route element={<AppShell user={uiKitPreviewUser} />}>
+          <Route path="/ui-kit" element={<UiKitPage />} />
+        </Route>
+      ) : null}
     </Routes>
   );
 }

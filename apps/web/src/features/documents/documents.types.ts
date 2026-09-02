@@ -19,6 +19,13 @@ export interface PublicDocument {
 
 export interface PublicDocumentDetails extends PublicDocument {
   processingError: string | null;
+  /**
+   * The raw backend processing state (PENDING/PROCESSING/CHUNKS_READY/EMBEDDING/READY/FAILED),
+   * kept alongside the coarse public `status` so the details page can render an honest,
+   * step-by-step pipeline without inventing data the backend does not track (e.g. no separate
+   * "parsed" vs "chunked" timestamps, no page/fragment/vector counts).
+   */
+  processingState: DocumentApiState;
 }
 
 export interface PublicDeletedDocument {

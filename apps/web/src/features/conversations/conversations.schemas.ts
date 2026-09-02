@@ -87,3 +87,28 @@ export const conversationMessageCreateResponseSchema = z.object({
     sources: z.array(conversationSourceSchema),
   }),
 });
+
+export const conversationMessageStreamEventSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('status'),
+    phase: z.enum(['retrieving', 'generating']),
+  }),
+  z.object({
+    type: z.literal('user_message'),
+    message: conversationMessageBaseSchema.extend({ role: z.literal('USER') }),
+  }),
+  z.object({
+    type: z.literal('delta'),
+    delta: z.string(),
+  }),
+  z.object({
+    type: z.literal('completed'),
+    result: conversationMessageCreateResponseSchema.shape.data,
+  }),
+]);
+
+export const conversationMessageStreamErrorSchema = z.object({
+  code: z.string().min(1),
+  message: z.string().min(1),
+  status: z.number().int().min(400).max(599),
+});

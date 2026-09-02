@@ -10,6 +10,24 @@ import { MessageComposer } from './MessageComposer';
 const idleResource: MessageSubmissionResource = { error: null, status: 'idle' };
 
 describe('MessageComposer', () => {
+  it('keeps the compact pill limited to the textbox and send action without idle helper copy', () => {
+    const { container } = render(
+      <MessageComposer
+        compact
+        disabled={false}
+        isSubmitting={false}
+        onSubmit={vi.fn()}
+        resource={idleResource}
+      />,
+    );
+
+    const pill = container.querySelector('.chat-composer-pill');
+    expect(pill).toContainElement(screen.getByRole('textbox', { name: 'Message' }));
+    expect(pill).toContainElement(screen.getByRole('button', { name: 'Send message' }));
+    expect(container.querySelector('.chat-composer-helper')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Enter to send/)).not.toBeInTheDocument();
+  });
+
   it('provides an accessible multiline textbox and Send button without unsupported controls', () => {
     render(
       <MessageComposer
@@ -165,13 +183,19 @@ describe('MessageComposer', () => {
         disabled={false}
         isSubmitting
         onSubmit={vi.fn()}
-        resource={{ error: null, status: 'submitting' }}
+        resource={{
+          error: null,
+          pendingContent: 'Question',
+          phase: 'generating',
+          status: 'submitting',
+          streamedAnswer: 'Partial answer',
+        }}
       />,
     );
 
     expect(screen.getByRole('textbox', { name: 'Message' })).toHaveAttribute('readonly');
     expect(screen.getByRole('button', { name: 'Send message' })).toBeDisabled();
-    expect(screen.getByText('Preparing an answer…')).toHaveAttribute('role', 'status');
+    expect(screen.getByText('Generating answer…')).toHaveAttribute('role', 'status');
     expect(screen.queryByText(/token|typing|%/i)).not.toBeInTheDocument();
   });
 });

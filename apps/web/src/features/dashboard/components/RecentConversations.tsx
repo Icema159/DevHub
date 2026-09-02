@@ -24,7 +24,7 @@ export function RecentConversations({ onRetry, resource }: RecentConversationsPr
         </Link>
       }
       className="min-w-0"
-      title="Recent conversations"
+      title="Recent threads"
     >
       {resource.status === 'loading' ? <ListSkeleton count={5} /> : null}
 
@@ -34,25 +34,25 @@ export function RecentConversations({ onRetry, resource }: RecentConversationsPr
 
       {resource.status === 'success' && resource.data.conversations.length === 0 ? (
         <EmptyState
-          className="py-8"
-          description="Your latest knowledge conversations will appear here."
+          className="overview-v4-empty-state py-8"
+          description="Your latest knowledge threads will appear here."
           icon={<MessagesSquare className="size-6" aria-hidden="true" />}
-          title="No conversations yet"
+          title="No threads yet"
         />
       ) : null}
 
       {resource.status === 'success' && resource.data.conversations.length > 0 ? (
-        <ul className="divide-y divide-border/80">
+        <ul className="overview-v4-rows divide-y divide-border/80">
           {resource.data.conversations.map((conversation) => {
             const title = conversation.title?.trim() || 'New conversation';
 
             return (
               <li key={conversation.id} className="min-w-0 py-1">
                 <Link
-                  className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-control px-2 py-2 transition hover:bg-primary-soft/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="overview-v4-row overview-v4-row-link grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-control px-2 py-2.5 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                   to={`/chat/${encodeURIComponent(conversation.id)}`}
                 >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary">
+                  <span className="overview-conversation-icon flex size-9 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary">
                     <MessageCircle className="size-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0">

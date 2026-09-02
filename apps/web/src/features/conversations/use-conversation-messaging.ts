@@ -4,7 +4,7 @@ import { ApiClientError, normalizeApiError } from '../../lib/api-client';
 import {
   conversationMessageValidationError,
   normalizeConversationMessageContent,
-  sendConversationMessage,
+  streamConversationMessage,
 } from './conversations.service';
 import type {
   ConversationTurnResult,
@@ -15,7 +15,14 @@ import type {
 export type MessageSubmissionResource =
   | {
       error: null;
-      status: 'idle' | 'submitting';
+      status: 'idle';
+    }
+  | {
+      error: null;
+      pendingContent: string;
+      phase: 'starting' | 'retrieving' | 'generating';
+      status: 'submitting';
+      streamedAnswer: string;
     }
   | {
       assistantMessageId: string;
@@ -41,6 +48,7 @@ export interface UseConversationMessagingOptions {
 }
 
 interface ActiveRequest {
+  abortController: AbortController;
   conversationId: string;
   promise: Promise<MessageSubmissionOutcome>;
 }
@@ -195,6 +203,7 @@ export function useConversationMessaging({
 
     return () => {
       mountedRef.current = false;
+      activeRequestRef.current?.abortController.abort();
     };
   }, []);
 
@@ -240,15 +249,46 @@ export function useConversationMessaging({
 
       const content = normalizeConversationMessageContent(draft);
       const previousMessageIds = new Set(messagesRef.current.map((message) => message.id));
+      const abortController = new AbortController();
 
-      commitForConversation(requestConversationId, { error: null, status: 'submitting' });
+      commitForConversation(requestConversationId, {
+        error: null,
+        pendingContent: content,
+        phase: 'starting',
+        status: 'submitting',
+        streamedAnswer: '',
+      });
       setActiveConversationId(requestConversationId);
 
       const request = (async (): Promise<MessageSubmissionOutcome> => {
         try {
-          const turn: ConversationTurnResult = await sendConversationMessage(
+          let streamedAnswer = '';
+          const turn: ConversationTurnResult = await streamConversationMessage(
             requestConversationId,
             content,
+            {
+              signal: abortController.signal,
+              onEvent(event) {
+                if (event.type === 'delta') {
+                  streamedAnswer += event.delta;
+                  commitForConversation(requestConversationId, {
+                    error: null,
+                    pendingContent: content,
+                    phase: 'generating',
+                    status: 'submitting',
+                    streamedAnswer,
+                  });
+                } else if (event.type === 'status') {
+                  commitForConversation(requestConversationId, {
+                    error: null,
+                    pendingContent: content,
+                    phase: event.phase,
+                    status: 'submitting',
+                    streamedAnswer,
+                  });
+                }
+              },
+            },
           );
 
           if (!mountedRef.current || routeConversationIdRef.current !== requestConversationId) {
@@ -347,6 +387,7 @@ export function useConversationMessaging({
       })();
 
       activeRequestRef.current = {
+        abortController,
         conversationId: requestConversationId,
         promise: request,
       };

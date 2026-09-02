@@ -58,7 +58,7 @@ export function DocumentInformationCard({ document }: DocumentInformationCardPro
             id="document-information-heading"
             className="type-heading-3 font-semibold text-foreground"
           >
-            Document information
+            Details
           </h2>
         </div>
 

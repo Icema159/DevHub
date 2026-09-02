@@ -19,7 +19,7 @@ export function SidebarNavItem({ active, icon: Icon, label, onNavigate, to }: Si
       aria-current={active ? 'page' : undefined}
       className={({ isActive }) =>
         cn(
-          'focus-material relative flex min-h-11 items-center gap-3 overflow-hidden rounded-control border border-transparent px-3 type-body font-medium text-secondary transition',
+          'sidebar-nav-link focus-material relative flex min-h-11 items-center gap-3 overflow-hidden rounded-control border border-transparent px-3 type-body font-medium text-secondary transition',
           'hover:bg-white/70 hover:text-foreground',
           (active ?? isActive) && 'material-selected border-primary/15 text-primary',
         )
@@ -28,7 +28,7 @@ export function SidebarNavItem({ active, icon: Icon, label, onNavigate, to }: Si
       {({ isActive }) => (
         <>
           <Icon
-            className="size-5"
+            className="sidebar-nav-icon size-5"
             strokeWidth={(active ?? isActive) ? 2 : 1.75}
             aria-hidden="true"
           />

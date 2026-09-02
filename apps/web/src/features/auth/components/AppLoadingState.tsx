@@ -1,6 +1,7 @@
 import { LoaderCircle, RefreshCw } from 'lucide-react';
 
 import { Brand } from '../../../components/layout';
+import { AmbientLightLayer } from '../../../components/layout/AmbientLightLayer';
 import { Alert, Button, Card } from '../../../components/ui';
 
 export interface AppLoadingStateProps {
@@ -10,16 +11,10 @@ export interface AppLoadingStateProps {
 
 export function AppLoadingState({ error, onRetry }: AppLoadingStateProps) {
   return (
-    <main className="relative isolate flex min-h-dvh items-center justify-center overflow-hidden bg-background px-4 py-10">
-      <div
-        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
-        aria-hidden="true"
-      >
-        <div className="absolute -top-44 -left-36 size-[30rem] rounded-full bg-indigo-200/45 blur-3xl" />
-        <div className="absolute -right-40 -bottom-48 size-[34rem] rounded-full bg-sky-200/35 blur-3xl" />
-      </div>
+    <main className="app-canvas overview-v4-identity auth-v4-identity relative isolate flex min-h-dvh items-center justify-center overflow-hidden px-4 py-10">
+      <AmbientLightLayer />
 
-      <Card className="w-full max-w-md p-7 text-center sm:p-8" variant="glass">
+      <Card className="relative z-10 w-full max-w-md p-7 text-center sm:p-8" variant="glass">
         <Brand className="justify-center" />
         {error ? (
           <>
@@ -27,7 +22,11 @@ export function AppLoadingState({ error, onRetry }: AppLoadingStateProps) {
               {error}
             </Alert>
             {onRetry ? (
-              <Button className="mt-5 w-full" onClick={onRetry} variant="secondary">
+              <Button
+                className="auth-v4-secondary-button mt-5 w-full"
+                onClick={onRetry}
+                variant="secondary"
+              >
                 <RefreshCw className="size-4" aria-hidden="true" />
                 Try again
               </Button>
