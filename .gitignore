@@ -3,6 +3,7 @@ node_modules/
 
 # Builds and coverage
 dist/
+apps/web/dist_stale*/
 build/
 coverage/
 .next/

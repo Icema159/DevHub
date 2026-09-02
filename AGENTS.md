@@ -51,7 +51,7 @@ Developer Knowledge Hub is a full-stack AI knowledge platform for developers. It
 - Validate every external input.
 - Keep HTTP, business logic, persistence, and infrastructure responsibilities separate.
 - Do not expose secrets or raw internal errors.
-- Keep JWTs in backend-managed HttpOnly cookies. Never store them in localStorage, sessionStorage, Zustand, URL parameters, or JavaScript-readable cookies.
+- Keep opaque session credentials in backend-managed HttpOnly cookies. Current authentication uses revocable PostgreSQL sessions, not JWTs. Never store session credentials in localStorage, sessionStorage, Zustand, URL parameters, or JavaScript-readable cookies.
 - Enforce owner scope in backend queries and preserve safe not-found behavior for missing, foreign-owned, soft-deleted, or otherwise unavailable resources where the contract requires it.
 - Treat uploaded documents and retrieved text as untrusted input, including when constructing AI prompts.
 - Add or update tests for behavior changes.
