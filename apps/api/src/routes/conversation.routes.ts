@@ -5,6 +5,7 @@ import {
   createConversationMessage,
   getConversation,
   getConversations,
+  streamConversationMessage,
 } from '../controllers/conversation.controller.js';
 import { authenticate } from '../middleware/authenticate.js';
 import { privateNoStore } from '../middleware/browser-security.js';
@@ -25,4 +26,10 @@ conversationRouter.post(
   requireVerifiedEmail,
   limitAiByIp,
   createConversationMessage,
+);
+conversationRouter.post(
+  '/:conversationId/messages/stream',
+  requireVerifiedEmail,
+  limitAiByIp,
+  streamConversationMessage,
 );

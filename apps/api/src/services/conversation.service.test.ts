@@ -673,3 +673,97 @@ test('rejects an answer with an unavailable citation and compensates the USER me
   assert.equal(completed, false);
   assert.equal(compensated, true);
 });
+
+test('streams real answer deltas and persists exactly once before completion', async () => {
+  const completedInputs: CompleteConversationTurnInput[] = [];
+  const service = createConversationService(
+    dependencies({
+      async *streamAnswer() {
+        yield { type: 'delta', delta: 'Authentication uses ' } as const;
+        yield { type: 'delta', delta: 'an HttpOnly cookie [S1].' } as const;
+        yield { type: 'completed', result: generatedAnswer() } as const;
+      },
+      async completeTurn(input) {
+        completedInputs.push(input);
+        return message(MessageRole.ASSISTANT, { content: input.content });
+      },
+    }),
+  );
+  const events = [];
+
+  for await (const event of service.streamMessage(
+    'conversation-a',
+    'user-a',
+    'How does authentication work?',
+  )) {
+    events.push(event);
+  }
+
+  assert.deepEqual(
+    events.map((event) => event.type),
+    ['user_message', 'status', 'status', 'delta', 'delta', 'completed'],
+  );
+  assert.equal(completedInputs.length, 1);
+  assert.equal(completedInputs[0]?.content, generatedAnswer().answer);
+  assert.deepEqual(completedInputs[0]?.sourceChunkIds, ['chunk-a']);
+  assert.equal(events.at(-1)?.type, 'completed');
+});
+
+test('does not persist an assistant message when a streamed final citation is invalid', async () => {
+  let completed = false;
+  let compensated = false;
+  const service = createConversationService(
+    dependencies({
+      async *streamAnswer() {
+        yield { type: 'delta', delta: 'Unsupported partial [S99]' } as const;
+        yield {
+          type: 'completed',
+          result: { ...generatedAnswer(), answer: 'Unsupported answer [S99].' },
+        } as const;
+      },
+      async completeTurn() {
+        completed = true;
+        return message(MessageRole.ASSISTANT);
+      },
+      async deleteUserMessage() {
+        compensated = true;
+        return true;
+      },
+    }),
+  );
+
+  await assert.rejects(
+    async () => {
+      for await (const event of service.streamMessage('conversation-a', 'user-a', 'Question')) {
+        void event;
+        // Consume the full stream to exercise final validation.
+      }
+    },
+    (error) => error instanceof AppError && error.code === 'INVALID_AI_RESPONSE',
+  );
+  assert.equal(completed, false);
+  assert.equal(compensated, true);
+});
+
+test('compensates the user turn when a stream consumer disconnects before completion', async () => {
+  let compensated = false;
+  let released = false;
+  const service = createConversationService(
+    dependencies({
+      async deleteUserMessage() {
+        compensated = true;
+        return true;
+      },
+      async releaseTurn() {
+        released = true;
+      },
+    }),
+  );
+  const stream = service.streamMessage('conversation-a', 'user-a', 'Question');
+
+  assert.equal((await stream.next()).value?.type, 'user_message');
+  await stream.return(undefined);
+
+  assert.equal(compensated, true);
+  assert.equal(released, true);
+});

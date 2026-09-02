@@ -1,4 +1,7 @@
-import type { GeneratedChatAnswer } from '@developer-knowledge-hub/ai/chat-generation';
+import type {
+  ChatGenerationStreamEvent,
+  GeneratedChatAnswer,
+} from '@developer-knowledge-hub/ai/chat-generation';
 import { AiOperation } from '../../../../generated/prisma/client.js';
 
 import {
@@ -72,6 +75,16 @@ export interface ConversationTurnResult {
   sources: CitationSource[];
 }
 
+export type ConversationMessageStreamEvent =
+  | { type: 'status'; phase: 'retrieving' | 'generating' }
+  | { type: 'user_message'; message: PublicMessage }
+  | { type: 'delta'; delta: string }
+  | { type: 'completed'; result: ConversationTurnResult };
+
+export interface ConversationMessageStreamOptions {
+  signal?: AbortSignal;
+}
+
 export interface ConversationServiceDependencies {
   createConversation(userId: string): Promise<ConversationRecord>;
   listConversations(userId: string, page: number, limit: number): Promise<ConversationPageRecord>;
@@ -110,6 +123,16 @@ export interface ConversationServiceDependencies {
       userQuestion: string;
     },
   ): Promise<GeneratedChatAnswer>;
+  streamAnswer?(
+    userId: string,
+    input: {
+      systemInstructions: string;
+      conversationContext?: string;
+      context: string;
+      userQuestion: string;
+    },
+    options?: ConversationMessageStreamOptions,
+  ): AsyncIterable<ChatGenerationStreamEvent>;
   generateTitle(userId: string, firstQuestion: string): Promise<string>;
 }
 
@@ -143,6 +166,8 @@ const defaultDependencies: ConversationServiceDependencies = {
   retrieve: (userId, question) => retrievalService.search(userId, question),
   generateAnswer: (userId, input) =>
     aiBudgetService.generateChatAnswer(userId, AiOperation.ANSWER_GENERATION, input),
+  streamAnswer: (userId, input, options) =>
+    aiBudgetService.streamChatAnswer(userId, AiOperation.ANSWER_GENERATION, input, options),
   generateTitle: async (userId, firstQuestion) => {
     const result = await aiBudgetService.generateChatAnswer(
       userId,
@@ -379,6 +404,198 @@ async function compensateFailedTurn(
 export function createConversationService(
   dependencies: ConversationServiceDependencies = defaultDependencies,
 ) {
+  async function* streamMessage(
+    conversationId: string,
+    userId: string,
+    content: string,
+    options: ConversationMessageStreamOptions = {},
+  ): AsyncGenerator<ConversationMessageStreamEvent> {
+    const conversation = await dependencies.findConversation(conversationId, userId);
+
+    if (!conversation) {
+      throw conversationNotFoundError();
+    }
+
+    const turnReservation = await dependencies.reserveTurn(userId);
+
+    if (!turnReservation.allowed) {
+      throw new AppError(
+        429,
+        'AI_DAILY_LIMIT_REACHED',
+        "You've reached today's AI usage limit. Try again later.",
+      );
+    }
+
+    let userMessage: PublicMessageRecord;
+
+    try {
+      userMessage = await dependencies.createUserMessage(conversationId, userId, content);
+    } catch (error) {
+      await dependencies.releaseTurn(turnReservation.reservationId, userId);
+      if (error instanceof ActiveConversationNotFoundError) {
+        throw conversationNotFoundError();
+      }
+
+      throw error;
+    }
+
+    let turnFinalized = false;
+
+    try {
+      yield { type: 'user_message', message: toPublicMessage(userMessage) };
+      yield { type: 'status', phase: 'retrieving' };
+
+      const recentMessages = await dependencies.loadRecentContext(
+        conversationId,
+        userId,
+        userMessage.id,
+        MAX_CONVERSATION_CONTEXT_MESSAGES,
+      );
+      const conversationContext = buildBoundedConversationContext(
+        recentMessages.map((message) => ({
+          role: message.role === 'USER' ? ('USER' as const) : ('ASSISTANT' as const),
+          content: message.content,
+        })),
+      );
+      const retrievalQuery = buildContextAwareRetrievalQuery(content, conversationContext);
+      let chunks: RetrievedChunk[];
+
+      try {
+        chunks = await dependencies.retrieve(userId, retrievalQuery);
+      } catch (error) {
+        if (error instanceof AppError) {
+          throw error;
+        }
+
+        throw new AppError(500, 'RETRIEVAL_FAILED', 'Unable to retrieve document context');
+      }
+
+      if (chunks.length === 0) {
+        yield { type: 'status', phase: 'generating' };
+        yield { type: 'delta', delta: INSUFFICIENT_CONTEXT_ANSWER };
+
+        const message = await dependencies.completeTurn({
+          conversationId,
+          userId,
+          content: INSUFFICIENT_CONTEXT_ANSWER,
+          citations: [],
+          sourceChunkIds: [],
+        });
+
+        turnFinalized = true;
+        await dependencies.releaseTurn(turnReservation.reservationId, userId);
+        await maybeGenerateConversationTitle(dependencies, conversation, userMessage, userId);
+
+        yield {
+          type: 'completed',
+          result: {
+            message: toPublicMessage(message),
+            sources: [],
+          },
+        };
+        return;
+      }
+
+      const prompt = buildGroundedPrompt(content, chunks, conversationContext);
+      const generationInput = {
+        systemInstructions: prompt.systemInstructions,
+        ...(prompt.conversationContext ? { conversationContext: prompt.conversationContext } : {}),
+        context: prompt.context,
+        userQuestion: prompt.userQuestion,
+      };
+      let answer: GeneratedChatAnswer | null = null;
+
+      yield { type: 'status', phase: 'generating' };
+
+      try {
+        if (dependencies.streamAnswer) {
+          for await (const event of dependencies.streamAnswer(userId, generationInput, options)) {
+            if (event.type === 'delta') {
+              yield event;
+            } else {
+              answer = event.result;
+            }
+          }
+        } else {
+          answer = await dependencies.generateAnswer(userId, generationInput);
+        }
+      } catch (error) {
+        if (error instanceof AiBudgetUnavailableError) {
+          throw new AppError(
+            503,
+            'AI_TEMPORARILY_UNAVAILABLE',
+            'AI features are temporarily unavailable.',
+          );
+        }
+        throw new AppError(
+          503,
+          'AI_PROVIDER_UNAVAILABLE',
+          'Answer generation is temporarily unavailable',
+        );
+      }
+
+      if (!answer) {
+        throw new AppError(
+          503,
+          'AI_PROVIDER_UNAVAILABLE',
+          'Answer generation is temporarily unavailable',
+        );
+      }
+
+      let citedSources: CitationSource[];
+
+      try {
+        citedSources = selectCitedSources(answer.answer, prompt.sources);
+      } catch {
+        throw new AppError(
+          502,
+          'INVALID_AI_RESPONSE',
+          'Answer generation returned an invalid response',
+        );
+      }
+
+      let message: PublicMessageRecord;
+
+      try {
+        message = await dependencies.completeTurn({
+          conversationId,
+          userId,
+          content: answer.answer,
+          citations: citationSnapshot(citedSources),
+          aiMetadata: aiMetadata(answer),
+          sourceChunkIds: citedSources.map((source) => source.chunkId),
+          aiTurnReservationId: turnReservation.reservationId,
+        });
+      } catch (error) {
+        if (error instanceof ActiveConversationNotFoundError) {
+          throw conversationNotFoundError();
+        }
+
+        throw new AppError(
+          500,
+          'MESSAGE_PERSISTENCE_FAILED',
+          'Unable to save the generated answer',
+        );
+      }
+
+      turnFinalized = true;
+      await maybeGenerateConversationTitle(dependencies, conversation, userMessage, userId);
+
+      yield {
+        type: 'completed',
+        result: {
+          message: toPublicMessage(message),
+          sources: citedSources,
+        },
+      };
+    } finally {
+      if (!turnFinalized) {
+        await compensateFailedTurn(dependencies, userMessage, conversationId, userId);
+        await dependencies.releaseTurn(turnReservation.reservationId, userId);
+      }
+    }
+  }
+
   return {
     create(userId: string): Promise<ConversationRecord> {
       return dependencies.createConversation(userId);
@@ -416,155 +633,22 @@ export function createConversationService(
       userId: string,
       content: string,
     ): Promise<ConversationTurnResult> {
-      const conversation = await dependencies.findConversation(conversationId, userId);
+      let result: ConversationTurnResult | null = null;
 
-      if (!conversation) {
-        throw conversationNotFoundError();
+      for await (const event of streamMessage(conversationId, userId, content)) {
+        if (event.type === 'completed') {
+          result = event.result;
+        }
       }
 
-      const turnReservation = await dependencies.reserveTurn(userId);
-
-      if (!turnReservation.allowed) {
-        throw new AppError(
-          429,
-          'AI_DAILY_LIMIT_REACHED',
-          "You've reached today's AI usage limit. Try again later.",
-        );
+      if (!result) {
+        throw new AppError(503, 'AI_PROVIDER_UNAVAILABLE', 'Answer generation is unavailable');
       }
 
-      let userMessage: PublicMessageRecord;
-
-      try {
-        userMessage = await dependencies.createUserMessage(conversationId, userId, content);
-      } catch (error) {
-        await dependencies.releaseTurn(turnReservation.reservationId, userId);
-        if (error instanceof ActiveConversationNotFoundError) {
-          throw conversationNotFoundError();
-        }
-
-        throw error;
-      }
-
-      try {
-        const recentMessages = await dependencies.loadRecentContext(
-          conversationId,
-          userId,
-          userMessage.id,
-          MAX_CONVERSATION_CONTEXT_MESSAGES,
-        );
-        const conversationContext = buildBoundedConversationContext(
-          recentMessages.map((message) => ({
-            role: message.role === 'USER' ? ('USER' as const) : ('ASSISTANT' as const),
-            content: message.content,
-          })),
-        );
-        const retrievalQuery = buildContextAwareRetrievalQuery(content, conversationContext);
-        let chunks: RetrievedChunk[];
-
-        try {
-          chunks = await dependencies.retrieve(userId, retrievalQuery);
-        } catch (error) {
-          if (error instanceof AppError) {
-            throw error;
-          }
-
-          throw new AppError(500, 'RETRIEVAL_FAILED', 'Unable to retrieve document context');
-        }
-
-        if (chunks.length === 0) {
-          const message = await dependencies.completeTurn({
-            conversationId,
-            userId,
-            content: INSUFFICIENT_CONTEXT_ANSWER,
-            citations: [],
-            sourceChunkIds: [],
-          });
-
-          await dependencies.releaseTurn(turnReservation.reservationId, userId);
-
-          await maybeGenerateConversationTitle(dependencies, conversation, userMessage, userId);
-
-          return {
-            message: toPublicMessage(message),
-            sources: [],
-          };
-        }
-
-        const prompt = buildGroundedPrompt(content, chunks, conversationContext);
-        let answer: GeneratedChatAnswer;
-
-        try {
-          answer = await dependencies.generateAnswer(userId, {
-            systemInstructions: prompt.systemInstructions,
-            ...(prompt.conversationContext
-              ? { conversationContext: prompt.conversationContext }
-              : {}),
-            context: prompt.context,
-            userQuestion: prompt.userQuestion,
-          });
-        } catch (error) {
-          if (error instanceof AiBudgetUnavailableError) {
-            throw new AppError(
-              503,
-              'AI_TEMPORARILY_UNAVAILABLE',
-              'AI features are temporarily unavailable.',
-            );
-          }
-          throw new AppError(
-            503,
-            'AI_PROVIDER_UNAVAILABLE',
-            'Answer generation is temporarily unavailable',
-          );
-        }
-
-        let citedSources: CitationSource[];
-
-        try {
-          citedSources = selectCitedSources(answer.answer, prompt.sources);
-        } catch {
-          throw new AppError(
-            502,
-            'INVALID_AI_RESPONSE',
-            'Answer generation returned an invalid response',
-          );
-        }
-
-        let message: PublicMessageRecord;
-
-        try {
-          message = await dependencies.completeTurn({
-            conversationId,
-            userId,
-            content: answer.answer,
-            citations: citationSnapshot(citedSources),
-            aiMetadata: aiMetadata(answer),
-            sourceChunkIds: citedSources.map((source) => source.chunkId),
-            aiTurnReservationId: turnReservation.reservationId,
-          });
-        } catch (error) {
-          if (error instanceof ActiveConversationNotFoundError) {
-            throw conversationNotFoundError();
-          }
-
-          throw new AppError(
-            500,
-            'MESSAGE_PERSISTENCE_FAILED',
-            'Unable to save the generated answer',
-          );
-        }
-
-        await maybeGenerateConversationTitle(dependencies, conversation, userMessage, userId);
-
-        return {
-          message: toPublicMessage(message),
-          sources: citedSources,
-        };
-      } catch (error) {
-        await compensateFailedTurn(dependencies, userMessage, conversationId, userId);
-        await dependencies.releaseTurn(turnReservation.reservationId, userId);
-        throw error;
-      }
+      return result;
     },
+
+    streamMessage,
   };
 }
 

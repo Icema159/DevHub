@@ -1,5 +1,7 @@
 import type {
   ChatGenerationInput,
+  ChatGenerationStreamEvent,
+  ChatGenerationStreamOptions,
   GeneratedChatAnswer,
 } from '@developer-knowledge-hub/ai/chat-generation';
 import type { GeneratedEmbedding } from '@developer-knowledge-hub/ai/embedding';
@@ -50,6 +52,35 @@ async function commitConservative(
     source: AiUsageSource.CONSERVATIVE_ESTIMATE,
   });
   logWarnings(operation, model, result.warnings);
+}
+
+async function commitChatUsage(
+  reservationId: string,
+  reservedMicroUsd: bigint,
+  operation: AiOperation,
+  provider: string,
+  model: string,
+  answer: GeneratedChatAnswer,
+): Promise<void> {
+  const usage = answer.usage;
+  const commit = usage
+    ? await repository.commit({
+        reservationId,
+        estimatedMicroUsd: estimateUsageMicroUsd(provider, model, usage),
+        source: AiUsageSource.PROVIDER_REPORTED,
+        inputTokens: usage.inputTokens,
+        ...(usage.cachedInputTokens === undefined
+          ? {}
+          : { cachedInputTokens: usage.cachedInputTokens }),
+        outputTokens: usage.outputTokens,
+        totalTokens: usage.totalTokens,
+      })
+    : await repository.commit({
+        reservationId,
+        estimatedMicroUsd: reservedMicroUsd,
+        source: AiUsageSource.CONSERVATIVE_ESTIMATE,
+      });
+  logWarnings(operation, answer.model, commit.warnings);
 }
 
 export const aiBudgetService = {
@@ -124,29 +155,77 @@ export const aiBudgetService = {
 
     try {
       const answer = await getChatGenerationService(maxOutputTokens).generateAnswer(input);
-      const usage = answer.usage;
-      const commit = usage
-        ? await repository.commit({
-            reservationId: decision.reservationId,
-            estimatedMicroUsd: estimateUsageMicroUsd(provider, model, usage),
-            source: AiUsageSource.PROVIDER_REPORTED,
-            inputTokens: usage.inputTokens,
-            ...(usage.cachedInputTokens === undefined
-              ? {}
-              : { cachedInputTokens: usage.cachedInputTokens }),
-            outputTokens: usage.outputTokens,
-            totalTokens: usage.totalTokens,
-          })
-        : await repository.commit({
-            reservationId: decision.reservationId,
-            estimatedMicroUsd: reservedMicroUsd,
-            source: AiUsageSource.CONSERVATIVE_ESTIMATE,
-          });
-      logWarnings(operation, answer.model, commit.warnings);
+      await commitChatUsage(
+        decision.reservationId,
+        reservedMicroUsd,
+        operation,
+        provider,
+        model,
+        answer,
+      );
       return answer;
     } catch (error) {
       await commitConservative(decision.reservationId, reservedMicroUsd, operation, model);
       throw error;
+    }
+  },
+
+  async *streamChatAnswer(
+    userId: string,
+    operation: 'ANSWER_GENERATION',
+    input: ChatGenerationInput,
+    options: ChatGenerationStreamOptions = {},
+  ): AsyncGenerator<ChatGenerationStreamEvent> {
+    const provider = 'openai';
+    const model = env.openaiChatModel;
+    const maxOutputTokens = env.openaiChatMaxOutputTokens;
+    const reservedMicroUsd = estimateChatReservationMicroUsd(
+      provider,
+      model,
+      JSON.stringify(input),
+      maxOutputTokens,
+    );
+    const decision = await repository.reserve({
+      userId,
+      operation,
+      provider,
+      model,
+      reservedMicroUsd,
+    });
+
+    if (!decision.allowed) throw new AiBudgetUnavailableError(decision.retryAt);
+
+    let reservationSettled = false;
+
+    try {
+      for await (const event of getChatGenerationService(maxOutputTokens).streamAnswer(
+        input,
+        options,
+      )) {
+        if (event.type === 'completed') {
+          await commitChatUsage(
+            decision.reservationId,
+            reservedMicroUsd,
+            operation,
+            provider,
+            model,
+            event.result,
+          );
+          reservationSettled = true;
+        }
+
+        yield event;
+      }
+    } catch (error) {
+      if (!reservationSettled) {
+        await commitConservative(decision.reservationId, reservedMicroUsd, operation, model);
+        reservationSettled = true;
+      }
+      throw error;
+    } finally {
+      if (!reservationSettled) {
+        await commitConservative(decision.reservationId, reservedMicroUsd, operation, model);
+      }
     }
   },
 };

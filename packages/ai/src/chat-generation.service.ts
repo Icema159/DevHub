@@ -26,9 +26,23 @@ export interface ChatGenerationProviderInput extends ChatGenerationInput {
   maxOutputTokens: number;
 }
 
+export type ChatProviderStreamEvent =
+  { type: 'delta'; delta: string } | { type: 'completed'; result: ChatProviderResult };
+
+export type ChatGenerationStreamEvent =
+  { type: 'delta'; delta: string } | { type: 'completed'; result: GeneratedChatAnswer };
+
+export interface ChatGenerationStreamOptions {
+  signal?: AbortSignal;
+}
+
 export interface ChatGenerationProvider {
   readonly providerName: string;
   generateAnswer(input: ChatGenerationProviderInput): Promise<ChatProviderResult>;
+  streamAnswer?(
+    input: ChatGenerationProviderInput,
+    options?: ChatGenerationStreamOptions,
+  ): AsyncIterable<ChatProviderStreamEvent>;
 }
 
 export interface ChatGenerationServiceConfig {
@@ -85,5 +99,74 @@ export class ChatGenerationService {
       provider: this.provider.providerName,
       generationDurationMs,
     };
+  }
+
+  async *streamAnswer(
+    input: ChatGenerationInput,
+    options: ChatGenerationStreamOptions = {},
+  ): AsyncGenerator<ChatGenerationStreamEvent> {
+    requireText('System instructions', input.systemInstructions);
+    requireText('Context', input.context);
+    requireText('User question', input.userQuestion);
+
+    const startedAt = this.now();
+    const providerInput = {
+      ...input,
+      model: this.config.model,
+      maxOutputTokens: this.config.maxOutputTokens,
+    };
+
+    if (!this.provider.streamAnswer) {
+      const result = await this.provider.generateAnswer(providerInput);
+      const generationDurationMs = Math.max(0, Math.round(this.now() - startedAt));
+
+      requireText('Generated answer', result.answer);
+      requireText('Returned chat model', result.model);
+
+      yield {
+        type: 'completed',
+        result: {
+          ...result,
+          provider: this.provider.providerName,
+          generationDurationMs,
+        },
+      };
+      return;
+    }
+
+    let completed = false;
+
+    for await (const event of this.provider.streamAnswer(providerInput, options)) {
+      if (event.type === 'delta') {
+        if (completed) {
+          throw new Error('Chat provider emitted output after completion');
+        }
+        if (event.delta) {
+          yield event;
+        }
+        continue;
+      }
+
+      if (completed) {
+        throw new Error('Chat provider emitted more than one completion');
+      }
+      completed = true;
+
+      const generationDurationMs = Math.max(0, Math.round(this.now() - startedAt));
+      requireText('Generated answer', event.result.answer);
+      requireText('Returned chat model', event.result.model);
+      yield {
+        type: 'completed',
+        result: {
+          ...event.result,
+          provider: this.provider.providerName,
+          generationDurationMs,
+        },
+      };
+    }
+
+    if (!completed) {
+      throw new Error('Chat provider stream ended before completion');
+    }
   }
 }

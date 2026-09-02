@@ -244,21 +244,23 @@ test('conversation detail and message routes preserve owner isolation', async (c
           where: { conversationId: foreignConversationId },
         });
 
-        assert.deepEqual(
-          await request(`/api/conversations/${foreignConversationId}/messages`, {
-            method: 'POST',
-            body: {
-              content: 'Attempted cross-owner message',
-              userId: foreignOwnerId,
-              ownerId: foreignOwnerId,
-              citations: [{ documentName: 'Client supplied citation' }],
+        for (const suffix of ['/messages', '/messages/stream']) {
+          assert.deepEqual(
+            await request(`/api/conversations/${foreignConversationId}${suffix}`, {
+              method: 'POST',
+              body: {
+                content: 'Attempted cross-owner message',
+                userId: foreignOwnerId,
+                ownerId: foreignOwnerId,
+                citations: [{ documentName: 'Client supplied citation' }],
+              },
+            }),
+            {
+              status: 404,
+              body: notFoundResponse,
             },
-          }),
-          {
-            status: 404,
-            body: notFoundResponse,
-          },
-        );
+          );
+        }
         assert.equal(
           await prisma.message.count({ where: { conversationId: foreignConversationId } }),
           foreignMessageCountBefore,

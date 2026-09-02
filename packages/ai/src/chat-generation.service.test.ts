@@ -80,3 +80,54 @@ test('rejects an empty provider answer', async () => {
     /Generated answer must not be empty/,
   );
 });
+
+test('forwards provider deltas and attaches metadata only to the completed result', async () => {
+  const times = [200, 245];
+  const provider: ChatGenerationProvider = {
+    providerName: 'mock-provider',
+    async generateAnswer() {
+      throw new Error('non-streaming path should not be used');
+    },
+    async *streamAnswer() {
+      yield { type: 'delta', delta: 'First ' };
+      yield { type: 'delta', delta: 'tokens' };
+      yield {
+        type: 'completed',
+        result: {
+          answer: 'First tokens',
+          model: 'mock-stream-model',
+          usage: { inputTokens: 10, outputTokens: 2, totalTokens: 12 },
+        },
+      };
+    },
+  };
+  const service = new ChatGenerationService(provider, {
+    model: 'configured-chat-model',
+    maxOutputTokens: 800,
+    now: () => times.shift() ?? 245,
+  });
+  const events = [];
+
+  for await (const event of service.streamAnswer({
+    systemInstructions: 'Use only context.',
+    context: '[S1] context',
+    userQuestion: 'question',
+  })) {
+    events.push(event);
+  }
+
+  assert.deepEqual(events, [
+    { type: 'delta', delta: 'First ' },
+    { type: 'delta', delta: 'tokens' },
+    {
+      type: 'completed',
+      result: {
+        answer: 'First tokens',
+        model: 'mock-stream-model',
+        usage: { inputTokens: 10, outputTokens: 2, totalTokens: 12 },
+        provider: 'mock-provider',
+        generationDurationMs: 45,
+      },
+    },
+  ]);
+});

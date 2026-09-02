@@ -3,7 +3,9 @@ import OpenAI from 'openai';
 import type {
   ChatGenerationProvider,
   ChatGenerationProviderInput,
+  ChatGenerationStreamOptions,
   ChatProviderResult,
+  ChatProviderStreamEvent,
   ChatTokenUsage,
 } from './chat-generation.service.js';
 
@@ -90,5 +92,61 @@ export class OpenAIChatGenerationProvider implements ChatGenerationProvider {
     }
 
     return result;
+  }
+
+  async *streamAnswer(
+    input: ChatGenerationProviderInput,
+    options: ChatGenerationStreamOptions = {},
+  ): AsyncGenerator<ChatProviderStreamEvent> {
+    const stream = await this.client.responses.create(
+      {
+        model: input.model,
+        instructions: input.systemInstructions,
+        input: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'input_text',
+                text: formatChatGenerationInput(input),
+              },
+            ],
+          },
+        ],
+        max_output_tokens: input.maxOutputTokens,
+        store: false,
+        stream: true,
+      },
+      options.signal ? { signal: options.signal } : undefined,
+    );
+    let completed = false;
+    let answer = '';
+
+    for await (const event of stream) {
+      if (event.type === 'response.output_text.delta') {
+        answer += event.delta;
+        yield { type: 'delta', delta: event.delta };
+        continue;
+      }
+
+      if (event.type === 'response.completed') {
+        completed = true;
+        const result: ChatProviderResult = {
+          answer,
+          model: event.response.model,
+        };
+        const usage = toTokenUsage(event.response.usage);
+
+        if (usage) {
+          result.usage = usage;
+        }
+
+        yield { type: 'completed', result };
+      }
+    }
+
+    if (!completed) {
+      throw new Error('OpenAI response stream ended before completion');
+    }
   }
 }
