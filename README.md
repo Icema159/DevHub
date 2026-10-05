@@ -13,6 +13,16 @@ Built as a portfolio project to demonstrate how product UX, secure APIs, asynchr
 
 The current MVP serves individual developers. It accepts text-based PDFs; it does not yet display or download the original PDF in the UI.
 
+## Product preview
+
+Real screens from the locally running V4 app, using a [synthetic sample PDF](docs/demo/sample-architecture.pdf). Click a screenshot to view it at full size.
+
+| Overview                                                                                                                 | Documents                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| [![Overview with document status, recent items, and primary actions](docs/demo/overview.png)](docs/demo/overview.png)    | [![Documents with search, status filters, and a ready PDF](docs/demo/documents.png)](docs/demo/documents.png)                                |
+| **Document details and processing pipeline**                                                                             | **Thread with grounded answer and citations**                                                                                                |
+| [![Document details with completed processing pipeline](docs/demo/document-details.png)](docs/demo/document-details.png) | [![Thread answer with inline citation markers and linked sources](docs/demo/thread-with-citations.png)](docs/demo/thread-with-citations.png) |
+
 ## How it works
 
 ```text
